@@ -1,28 +1,16 @@
-id: f4ab2bb05e7d4757bf65c6d06046cf76
+id: 10eb4f16d43f41fe90064829cf241d18
 annotation_type: Quotation
 revision: '00001'
 annotations:
-  21f9e2dafb3a48dc9d7c34e22fa60eb9:
+  a1f3e26bdb08449aaece0bba4ac4f5cc:
     span:
-      start: 45402
-      end: 45527
-  1466fe93cebb4c69b38c09dec2fad984:
+      start: 16302
+      end: 16302
+  670003b927a54a5aad937c6ae0206e61:
     span:
-      start: 96462
-      end: 96587
-  65a6260dd16c4e56864ab6a8b0e921e8:
+      start: 16444
+      end: 16444
+  4b95aa69bb6647d191e09a5e47dd5fa5:
     span:
-      start: 96598
-      end: 96711
-  d922d05761ec4a409b2e1fd3775cf60e:
-    span:
-      start: 96722
-      end: 96798
-  3ae9c7b621fa4f23b44d969067bbe49e:
-    span:
-      start: 98029
-      end: 98143
-  89f7d5adc6a3425abde45ced6b00b647:
-    span:
-      start: 146500
-      end: 146590
+      start: 17717
+      end: 17717
