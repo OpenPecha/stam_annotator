@@ -34,10 +34,14 @@ class AnnotationDocument:
         self.annotations = Annotations(annotations)
 
 
+def create_annotation_instance(data: Dict) -> AnnotationDocument:
+    return AnnotationDocument(**data)
+
+
 if __name__ == "__main__":
     data = load_annotations_from_yaml(DATA_DIR / "Quotation.yml")
 
-    annotation_doc = AnnotationDocument(**data)
+    annotation_doc = create_annotation_instance(data)
     print(f"id: {annotation_doc.id}")
     print(f"annotation_type: {annotation_doc.annotation_type}")
     print(f"revision: {annotation_doc.revision}")
