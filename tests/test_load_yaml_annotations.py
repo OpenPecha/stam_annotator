@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from stam_annotator.load_yaml_annotations import load_annotations_from_yaml
+from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 
 
-def test_load_annotations_from_yaml():
+def test_load_opf_annotations_from_yaml():
     # opf_author.yml has only one annotation
     yaml_file_path = Path(__file__).parent.absolute() / "data" / "opf_author.yml"
-    yaml_annotations = load_annotations_from_yaml(yaml_file_path)
+    yaml_annotations = load_opf_annotations_from_yaml(yaml_file_path)
     assert yaml_annotations["id"] == "5a54033501934d03bf5b8543542d9d6d"
     assert yaml_annotations["annotation_type"] == "Author"
     assert yaml_annotations["revision"] == "00001"
@@ -15,7 +15,7 @@ def test_load_annotations_from_yaml():
 
     # opf_quotations.yml has more than one annotation
     yaml_file_path = Path(__file__).parent.absolute() / "data" / "opf_quotations.yml"
-    yaml_annotations = load_annotations_from_yaml(yaml_file_path)
+    yaml_annotations = load_opf_annotations_from_yaml(yaml_file_path)
     assert yaml_annotations["id"] == "10eb4f16d43f41fe90064829cf241d18"
     assert yaml_annotations["annotation_type"] == "Quotation"
     assert yaml_annotations["revision"] == "00001"
