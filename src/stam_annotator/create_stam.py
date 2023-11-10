@@ -3,9 +3,9 @@ from typing import Union
 
 from stam import AnnotationStore, Offset, Selector
 
-from stam_annotator.annotations_loader import create_annotation_instance
 from stam_annotator.config import DATA_DIR
 from stam_annotator.load_yaml_annotations import load_annotations_from_yaml
+from stam_annotator.opf_annotations_loader import create_annotation_instance
 from stam_annotator.utility import get_filename_without_extension
 
 

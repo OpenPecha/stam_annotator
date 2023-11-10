@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from stam_annotator.annotations_loader import create_annotation_instance
 from stam_annotator.load_yaml_annotations import load_annotations_from_yaml
+from stam_annotator.opf_annotations_loader import create_annotation_instance
 
 
 def test_create_annotation_loader():
