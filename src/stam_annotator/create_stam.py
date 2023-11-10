@@ -18,7 +18,9 @@ def create_resource(store: AnnotationStore, id: str, text: str):
 
 
 def create_dataset(store: AnnotationStore, id: str, key: str):
-    return store.add_dataset(id=id).add_key(key)
+    dataset = store.add_dataset(id=id)
+    dataset.add_key(key)
+    return dataset
 
 
 def create_annotation(store: AnnotationStore, id: str, target: Selector, data: dict):
@@ -31,31 +33,30 @@ def annotation_pipeline(
     annotation_yaml_path: Union[str, Path],
     dataset_key: str,
 ) -> None:
+    # Create annotation store
     store = create_annotationstore(id=annotationstore_id)
-
+    # Create resource
     text_file_path = Path(text_file_path)
     text = text_file_path.read_text(encoding="utf-8")
     resource_id = get_filename_without_extension(text_file_path)
     resource = create_resource(store=store, id=resource_id, text=text)
-
+    # Create dataset
     yaml_file_path = Path(annotation_yaml_path)
     yaml_data = load_annotations_from_yaml(yaml_file_path)
     annotation_doc = create_annotation_instance(yaml_data)
 
-    _ = create_dataset(store=store, id=annotation_doc.id, key=dataset_key)
-
+    dataset = create_dataset(store=store, id=annotation_doc.id, key=dataset_key)
+    # Create annotation
     for uuid, value in annotation_doc.annotations.items():
+
+        data = dataset.add_data(dataset_key, annotation_doc.annotation_type, "D1")
         create_annotation(
             store=store,
             id=uuid,
             target=Selector.textselector(
                 resource, Offset.simple(value.span.start, value.span.end)
             ),
-            data={
-                "id": uuid,
-                "key": dataset_key,
-                "value": annotation_doc.annotation_type,
-            },
+            data=data,
         )
 
     output_file_name = get_filename_without_extension(yaml_file_path)
@@ -69,7 +70,7 @@ if __name__ == "__main__":
     annotationstore_id = "P000218_Volume_1"
     text_file_path = DATA_DIR / "v001.txt"
     annotation_yaml_path = DATA_DIR / "Author.yml"
-    dataset_key = "text annotation"
+    dataset_key = "Structure Type"
 
     # Run the pipeline
     annotation_pipeline(
