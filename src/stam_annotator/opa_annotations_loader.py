@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict, Iterator, Tuple
 
 from stam_annotator.config import OPA_DIR
@@ -44,10 +45,15 @@ class SegmentData:
         return iter(self.segment_pairs.items())
 
 
+def create_opa_annotation_instance(yaml_path: Path) -> SegmentData:
+
+    data = load_opa_annotations_from_yaml(yaml_path)
+    return SegmentData.from_dict(data)
+
+
 if __name__ == "__main__":
     file_path = OPA_DIR / "36CA.yml"
-    data = load_opa_annotations_from_yaml(file_path)
 
-    segment_data = SegmentData.from_dict(data)
+    segment_data = create_opa_annotation_instance(file_path)
     for pair_id, pair in segment_data.items():
         print(f"Pair ID: {pair_id}, Sources: {pair.sources}")

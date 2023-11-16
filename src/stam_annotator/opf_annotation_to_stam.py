@@ -5,7 +5,7 @@ from stam import AnnotationStore, Offset, Selector
 
 from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
-from stam_annotator.opf_annotations_loader import create_annotation_instance
+from stam_annotator.opf_annotations_loader import create_opf_annotation_instance
 from stam_annotator.utility import get_filename_without_extension
 
 
@@ -43,7 +43,7 @@ def annotation_pipeline(
     # Create dataset
     yaml_file_path = Path(annotation_yaml_path)
     yaml_data = load_opf_annotations_from_yaml(yaml_file_path)
-    annotation_doc = create_annotation_instance(yaml_data)
+    annotation_doc = create_opf_annotation_instance(yaml_data)
 
     dataset = create_dataset(store=store, id=annotation_doc.id, key=dataset_key)
     # Create annotation
