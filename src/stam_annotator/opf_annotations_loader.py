@@ -1,6 +1,6 @@
 from typing import Dict, Iterator, Tuple
 
-from stam_annotator.config import DATA_DIR
+from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 
 
@@ -39,7 +39,7 @@ def create_annotation_instance(data: Dict) -> AnnotationDocument:
 
 
 if __name__ == "__main__":
-    data = load_opf_annotations_from_yaml(DATA_DIR / "Quotation.yml")
+    data = load_opf_annotations_from_yaml(OPF_DIR / "Quotation.yml")
 
     annotation_doc = create_annotation_instance(data)
     print(f"id: {annotation_doc.id}")

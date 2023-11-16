@@ -3,7 +3,7 @@ from typing import Union
 
 from stam import AnnotationStore, Offset, Selector
 
-from stam_annotator.config import DATA_DIR
+from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 from stam_annotator.opf_annotations_loader import create_annotation_instance
 from stam_annotator.utility import get_filename_without_extension
@@ -60,7 +60,7 @@ def annotation_pipeline(
         )
 
     output_file_name = get_filename_without_extension(yaml_file_path)
-    output_file_path = DATA_DIR / f"{output_file_name}.json"
+    output_file_path = OPF_DIR / f"{output_file_name}.json"
     store.set_filename(str(output_file_path))
     store.save()
 
@@ -68,8 +68,8 @@ def annotation_pipeline(
 if __name__ == "__main__":
     # Define your file paths and other parameters
     annotationstore_id = "P000218_Volume_1"
-    text_file_path = DATA_DIR / "v001.txt"
-    annotation_yaml_path = DATA_DIR / "Author.yml"
+    text_file_path = OPF_DIR / "v001.txt"
+    annotation_yaml_path = OPF_DIR / "Author.yml"
     dataset_key = "Structure Type"
 
     # Run the pipeline
