@@ -1,6 +1,6 @@
 from typing import Dict, Iterator, Tuple
 
-from stam_annotator.config import DATA_DIR
+from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 
 
@@ -34,14 +34,14 @@ class AnnotationDocument:
         self.annotations = Annotations(annotations)
 
 
-def create_annotation_instance(data: Dict) -> AnnotationDocument:
+def create_opf_annotation_instance(data: Dict) -> AnnotationDocument:
     return AnnotationDocument(**data)
 
 
 if __name__ == "__main__":
-    data = load_opf_annotations_from_yaml(DATA_DIR / "Quotation.yml")
+    data = load_opf_annotations_from_yaml(OPF_DIR / "Quotation.yml")
 
-    annotation_doc = create_annotation_instance(data)
+    annotation_doc = create_opf_annotation_instance(data)
     print(f"id: {annotation_doc.id}")
     print(f"annotation_type: {annotation_doc.annotation_type}")
     print(f"revision: {annotation_doc.revision}")

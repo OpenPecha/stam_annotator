@@ -1,6 +1,6 @@
 import yaml
 
-from stam_annotator.config import DATA_DIR
+from stam_annotator.config import OPF_DIR
 
 
 def load_opf_annotations_from_yaml(yaml_file):
@@ -17,7 +17,13 @@ def load_opf_annotations_from_yaml(yaml_file):
     return data
 
 
+def load_opa_annotations_from_yaml(yaml_file):
+    with open(yaml_file) as f:
+        data = yaml.safe_load(f)
+    return data
+
+
 if __name__ == "__main__":
     # Load YAML annotations
-    yaml_annotations = load_opf_annotations_from_yaml(DATA_DIR / "Chapter.yml")
+    yaml_annotations = load_opf_annotations_from_yaml(OPF_DIR / "Chapter.yml")
     print(yaml_annotations)
