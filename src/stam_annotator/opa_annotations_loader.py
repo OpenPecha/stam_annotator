@@ -20,7 +20,7 @@ class SegmentPair:
         self.sources = sources
 
 
-class SegmentData:
+class OpaAnnotation:
     def __init__(
         self,
         segment_sources: Dict[str, SegmentSource],
@@ -30,7 +30,7 @@ class SegmentData:
         self.segment_pairs = segment_pairs
 
     @staticmethod
-    def from_dict(data: Dict) -> "SegmentData":
+    def from_dict(data: Dict) -> "OpaAnnotation":
         sources = {
             id: SegmentSource(id, **details)
             for id, details in data.get("segment_sources", {}).items()
@@ -39,21 +39,20 @@ class SegmentData:
             id: SegmentPair(id, {key: value for key, value in pair.items()})
             for id, pair in data.get("segment_pairs", {}).items()
         }
-        return SegmentData(segment_sources=sources, segment_pairs=pairs)
+        return OpaAnnotation(segment_sources=sources, segment_pairs=pairs)
 
     def items(self) -> Iterator[Tuple[str, SegmentPair]]:
         return iter(self.segment_pairs.items())
 
 
-def create_opa_annotation_instance(yaml_path: Path) -> SegmentData:
-
+def create_opa_annotation_instance(yaml_path: Path) -> OpaAnnotation:
     data = load_opa_annotations_from_yaml(yaml_path)
-    return SegmentData.from_dict(data)
+    return OpaAnnotation.from_dict(data)
 
 
 if __name__ == "__main__":
     file_path = OPA_DIR / "36CA.yml"
 
-    segment_data = create_opa_annotation_instance(file_path)
-    for pair_id, pair in segment_data.items():
+    opa_annotation = create_opa_annotation_instance(file_path)
+    for pair_id, pair in opa_annotation.items():
         print(f"Pair ID: {pair_id}, Sources: {pair.sources}")

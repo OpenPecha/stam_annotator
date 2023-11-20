@@ -26,7 +26,7 @@ class Annotations:
         return iter(self.annotations.items())
 
 
-class AnnotationDocument:
+class OpfAnnotation:
     def __init__(self, id: str, annotation_type: str, revision: str, annotations: Dict):
         self.id = id
         self.annotation_type = annotation_type
@@ -34,8 +34,8 @@ class AnnotationDocument:
         self.annotations = Annotations(annotations)
 
 
-def create_opf_annotation_instance(data: Dict) -> AnnotationDocument:
-    return AnnotationDocument(**data)
+def create_opf_annotation_instance(data: Dict) -> OpfAnnotation:
+    return OpfAnnotation(**data)
 
 
 if __name__ == "__main__":
