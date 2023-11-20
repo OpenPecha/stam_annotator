@@ -1,34 +1,39 @@
-from dataclasses import dataclass
 from typing import Dict
+
+from pydantic import BaseModel
 
 from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 
 
-@dataclass
-class Span:
+class Span(BaseModel):
     start: int
     end: int
 
 
-@dataclass
-class Annotation:
+class Annotation(BaseModel):
     uuid: str
     span: Span
 
 
-class Annotations(dict):
+class Annotations(BaseModel):
+    annotations_dict: Dict[str, Annotation]
+
     def __init__(self, annotations: Dict[str, Dict]):
-        super().__init__(
-            {
-                uuid: Annotation(uuid, Span(**value["span"]))
-                for uuid, value in annotations.items()
-            }
-        )
+        annotations_processed = {
+            uuid: Annotation(uuid=uuid, span=Span(**value["span"]))
+            for uuid, value in annotations.items()
+        }
+        super().__init__(annotations_dict=annotations_processed)
+
+    def __getitem__(self, item):
+        return self.annotations_dict[item]
+
+    def items(self):
+        return self.annotations_dict.items()
 
 
-@dataclass
-class OpfAnnotation:
+class OpfAnnotation(BaseModel):
     id: str
     annotation_type: str
     revision: str
