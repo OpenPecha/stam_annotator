@@ -1,49 +1,56 @@
+from dataclasses import dataclass
 from typing import Dict, Iterator, Tuple
 
 from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 
 
+@dataclass
 class Span:
-    def __init__(self, start: int, end: int):
-        self.start = start
-        self.end = end
+    start: int
+    end: int
 
 
-class Annotation(Span):
-    def __init__(self, uuid: str, span: Dict[str, int]):
-        self.uuid = uuid
-        self.span = Span(**span)
+@dataclass
+class Annotation:
+    uuid: str
+    span: Span
 
 
 class Annotations:
     def __init__(self, annotations: Dict[str, Dict]):
         self.annotations = {
-            uuid: Annotation(uuid, **value) for uuid, value in annotations.items()
+            uuid: Annotation(uuid, Span(**value["span"]))
+            for uuid, value in annotations.items()
         }
 
     def items(self) -> Iterator[Tuple[str, Annotation]]:
         return iter(self.annotations.items())
 
 
+@dataclass
 class OpfAnnotation:
-    def __init__(self, id: str, annotation_type: str, revision: str, annotations: Dict):
-        self.id = id
-        self.annotation_type = annotation_type
-        self.revision = revision
-        self.annotations = Annotations(annotations)
+    id: str
+    annotation_type: str
+    revision: str
+    annotations: Annotations
 
 
 def create_opf_annotation_instance(data: Dict) -> OpfAnnotation:
-    return OpfAnnotation(**data)
+    annotations = Annotations(data["annotations"])
+    return OpfAnnotation(
+        id=data["id"],
+        annotation_type=data["annotation_type"],
+        revision=data["revision"],
+        annotations=annotations,
+    )
 
 
 if __name__ == "__main__":
-    data = load_opf_annotations_from_yaml(OPF_DIR / "Quotation.yml")
-
-    annotation_doc = create_opf_annotation_instance(data)
-    print(f"id: {annotation_doc.id}")
-    print(f"annotation_type: {annotation_doc.annotation_type}")
-    print(f"revision: {annotation_doc.revision}")
-    for uuid, value in annotation_doc.annotations.items():
-        print(f"uuid: {uuid}, start:{value.span.start} - end:{value.span.end}")
+    opf_yml_data = load_opf_annotations_from_yaml(OPF_DIR / "Quotation.yml")
+    opf_annotation = create_opf_annotation_instance(opf_yml_data)
+    print(f"id: {opf_annotation.id}")
+    print(f"annotation_type: {opf_annotation.annotation_type}")
+    print(f"revision: {opf_annotation.revision}")
+    for uuid, value in opf_annotation.annotations.items():
+        print(f"uuid: {uuid}, start: {value.span.start} - end: {value.span.end}")
