@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Iterator, Tuple
+from typing import Dict
 
 from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
@@ -17,15 +17,14 @@ class Annotation:
     span: Span
 
 
-class Annotations:
+class Annotations(dict):
     def __init__(self, annotations: Dict[str, Dict]):
-        self.annotations = {
-            uuid: Annotation(uuid, Span(**value["span"]))
-            for uuid, value in annotations.items()
-        }
-
-    def items(self) -> Iterator[Tuple[str, Annotation]]:
-        return iter(self.annotations.items())
+        super().__init__(
+            {
+                uuid: Annotation(uuid, Span(**value["span"]))
+                for uuid, value in annotations.items()
+            }
+        )
 
 
 @dataclass
