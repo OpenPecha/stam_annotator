@@ -1,14 +1,14 @@
 from typing import Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 
 
 class Span(BaseModel):
-    start: int
-    end: int
+    start: int = Field(..., ge=0)
+    end: int = Field(..., ge=0)
 
 
 class Annotation(BaseModel):
