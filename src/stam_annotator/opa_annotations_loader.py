@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterator, Tuple
 
@@ -5,29 +6,25 @@ from stam_annotator.config import OPA_DIR
 from stam_annotator.load_yaml_annotations import load_opa_annotations_from_yaml
 
 
+@dataclass
 class SegmentSource:
-    def __init__(self, source_id: str, type: str, relation: str, lang: str, base: str):
-        self.source_id = source_id
-        self.type = type
-        self.relation = relation
-        self.lang = lang
-        self.base = base
+    source_id: str
+    type: str
+    relation: str
+    lang: str
+    base: str
 
 
+@dataclass
 class SegmentPair:
-    def __init__(self, pair_id: str, sources: Dict[str, str]):
-        self.pair_id = pair_id
-        self.sources = sources
+    pair_id: str
+    sources: Dict[str, str]
 
 
+@dataclass
 class OpaAnnotation:
-    def __init__(
-        self,
-        segment_sources: Dict[str, SegmentSource],
-        segment_pairs: Dict[str, SegmentPair],
-    ):
-        self.segment_sources = segment_sources
-        self.segment_pairs = segment_pairs
+    segment_sources: Dict[str, SegmentSource]
+    segment_pairs: Dict[str, SegmentPair]
 
     @staticmethod
     def from_dict(data: Dict) -> "OpaAnnotation":
@@ -52,7 +49,6 @@ def create_opa_annotation_instance(yaml_path: Path) -> OpaAnnotation:
 
 if __name__ == "__main__":
     file_path = OPA_DIR / "36CA.yml"
-
     opa_annotation = create_opa_annotation_instance(file_path)
     for pair_id, pair in opa_annotation.items():
         print(f"Pair ID: {pair_id}, Sources: {pair.sources}")
