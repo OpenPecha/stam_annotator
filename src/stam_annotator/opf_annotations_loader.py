@@ -1,14 +1,21 @@
 from typing import Dict
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 
 
 class Span(BaseModel):
-    start: int = Field(..., ge=0)
-    end: int = Field(..., ge=0)
+    start: int = Field(ge=0)
+    end: int = Field(ge=0)
+
+    @field_validator("end")
+    @classmethod
+    def end_must_not_be_less_than_start(cls, v: int, values: ValidationInfo) -> int:
+        if "start" in values.data and v < values.data["start"]:
+            raise ValueError("Span end must not be less than start")
+        return v
 
 
 class Annotation(BaseModel):
