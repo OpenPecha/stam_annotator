@@ -47,12 +47,12 @@ def annotation_pipeline(
 
     dataset = create_dataset(store=store, id=annotation_doc.id, key=dataset_key)
     # Create annotation
-    for uuid, value in annotation_doc.annotations.items():
+    for id, value in annotation_doc.annotations.items():
 
         data = dataset.add_data(dataset_key, annotation_doc.annotation_type, "D1")
         create_annotation(
             store=store,
-            id=uuid,
+            id=id,
             target=Selector.textselector(
                 resource, Offset.simple(value.span.start, value.span.end)
             ),

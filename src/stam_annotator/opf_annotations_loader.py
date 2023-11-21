@@ -20,7 +20,7 @@ class Span(BaseModel):
 
 
 class Annotation(BaseModel):
-    uuid: str
+    id: str
     span: Span
 
 
@@ -29,8 +29,8 @@ class Annotations(BaseModel):
 
     def __init__(self, annotations: Dict[str, Dict]):
         annotations_processed = {
-            uuid: Annotation(uuid=uuid, span=Span(**value["span"]))
-            for uuid, value in annotations.items()
+            id: Annotation(id=id, span=Span(**value["span"]))
+            for id, value in annotations.items()
         }
         super().__init__(annotations_dict=annotations_processed)
 
@@ -78,5 +78,5 @@ if __name__ == "__main__":
     print(f"id: {opf_annotation.id}")
     print(f"annotation_type: {opf_annotation.annotation_type}")
     print(f"revision: {opf_annotation.revision}")
-    for uuid, value in opf_annotation.annotations.items():
-        print(f"uuid: {uuid}, start: {value.span.start} - end: {value.span.end}")
+    for id, value in opf_annotation.annotations.items():
+        print(f"id: {id}, start: {value.span.start} - end: {value.span.end}")
