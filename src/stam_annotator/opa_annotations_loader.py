@@ -1,13 +1,13 @@
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterator, Tuple
+
+from pydantic import BaseModel
 
 from stam_annotator.config import OPA_DIR
 from stam_annotator.load_yaml_annotations import load_opa_annotations_from_yaml
 
 
-@dataclass
-class SegmentSource:
+class SegmentSource(BaseModel):
     source_id: str
     type: str
     relation: str
@@ -15,28 +15,25 @@ class SegmentSource:
     base: str
 
 
-@dataclass
-class SegmentPair:
+class SegmentPair(BaseModel):
     pair_id: str
     sources: Dict[str, str]
 
 
-@dataclass
-class OpaAnnotation:
+class OpaAnnotation(BaseModel):
     segment_sources: Dict[str, SegmentSource]
     segment_pairs: Dict[str, SegmentPair]
 
-    @staticmethod
-    def from_dict(data: Dict) -> "OpaAnnotation":
-        sources = {
-            id: SegmentSource(id, **details)
-            for id, details in data.get("segment_sources", {}).items()
+    @classmethod
+    def __init__(self, segment_sources: Dict, segment_pairs: Dict):
+        self.segment_sources = {
+            id: SegmentSource(source_id=id, **details)
+            for id, details in segment_sources.items()
         }
-        pairs = {
-            id: SegmentPair(id, {key: value for key, value in pair.items()})
-            for id, pair in data.get("segment_pairs", {}).items()
+        self.segment_pairs = {
+            id: SegmentPair(pair_id=id, sources=value)
+            for id, value in segment_pairs.items()
         }
-        return OpaAnnotation(segment_sources=sources, segment_pairs=pairs)
 
     def items(self) -> Iterator[Tuple[str, SegmentPair]]:
         return iter(self.segment_pairs.items())
@@ -44,7 +41,7 @@ class OpaAnnotation:
 
 def create_opa_annotation_instance(yaml_path: Path) -> OpaAnnotation:
     data = load_opa_annotations_from_yaml(yaml_path)
-    return OpaAnnotation.from_dict(data)
+    return OpaAnnotation(data["segment_sources"], data["segment_pairs"])
 
 
 if __name__ == "__main__":
