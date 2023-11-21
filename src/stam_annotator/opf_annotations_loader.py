@@ -57,6 +57,13 @@ class OpfAnnotation(BaseModel):
     def set_id(cls, v):
         return v or get_uuid()
 
+    @field_validator("annotation_type")
+    @classmethod
+    def annotation_type_must_alphabets(cls, v):
+        if not v.isalpha():
+            raise ValueError("annotation_type must be alphabetic")
+        return v
+
     @field_validator("revision")
     @classmethod
     def revision_must_int_parsible(cls, v):
