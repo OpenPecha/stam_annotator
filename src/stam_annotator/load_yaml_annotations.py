@@ -7,8 +7,10 @@ def load_opf_annotations_from_yaml(yaml_file):
     with open(yaml_file) as f:
         data = yaml.safe_load(f)
 
-    # Check if the annotations are a list and convert to a dictionary if so
-    if isinstance(data["annotations"], list):
+    # Check if 'annotations' key exists in the data
+    if "annotations" not in data:
+        data["annotations"] = {}
+    elif isinstance(data["annotations"], list):
         # Convert list to dictionary with index-based keys or some form of UUIDs
         data["annotations"] = {
             f"{index}": item for index, item in enumerate(data["annotations"])
@@ -25,5 +27,5 @@ def load_opa_annotations_from_yaml(yaml_file):
 
 if __name__ == "__main__":
     # Load YAML annotations
-    yaml_annotations = load_opf_annotations_from_yaml(OPF_DIR / "Chapter.yml")
+    yaml_annotations = load_opf_annotations_from_yaml(OPF_DIR / "Quotation.yml")
     print(yaml_annotations)

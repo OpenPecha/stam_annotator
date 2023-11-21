@@ -33,10 +33,13 @@ class Annotations(BaseModel):
     annotations_dict: Dict[str, Annotation]
 
     def __init__(self, annotations: Dict[str, Dict]):
-        annotations_processed = {
-            id: Annotation(id=id, span=Span(**value["span"]))
-            for id, value in annotations.items()
-        }
+        if annotations is None or not annotations:
+            annotations_processed = {}
+        else:
+            annotations_processed = {
+                id: Annotation(id=id, span=Span(**value["span"]))
+                for id, value in annotations.items()
+            }
         super().__init__(annotations_dict=annotations_processed)
 
     def __getitem__(self, item):
