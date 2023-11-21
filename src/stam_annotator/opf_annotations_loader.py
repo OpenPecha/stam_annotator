@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
+from stam_annotator.utility import get_uuid
 
 
 class Span(BaseModel):
@@ -45,6 +46,11 @@ class OpfAnnotation(BaseModel):
     annotation_type: str
     revision: str
     annotations: Annotations
+
+    @field_validator("id", mode="before")
+    @classmethod
+    def set_id(cls, v):
+        return v or get_uuid()
 
     @field_validator("revision")
     @classmethod
