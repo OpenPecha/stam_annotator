@@ -23,6 +23,11 @@ class Annotation(BaseModel):
     id: str
     span: Span
 
+    @field_validator("id", mode="before")
+    @classmethod
+    def set_id(cls, v):
+        return v or get_uuid()
+
 
 class Annotations(BaseModel):
     annotations_dict: Dict[str, Annotation]
