@@ -46,6 +46,15 @@ class OpfAnnotation(BaseModel):
     revision: str
     annotations: Annotations
 
+    @field_validator("revision")
+    @classmethod
+    def revision_must_int_parsible(cls, v):
+        if not v.isdigit():
+            raise ValueError(
+                "revision must be parsable to an integer and consist only of digits"
+            )
+        return v
+
 
 def create_opf_annotation_instance(data: Dict) -> OpfAnnotation:
     annotations = Annotations(data["annotations"])
