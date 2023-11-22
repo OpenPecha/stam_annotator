@@ -6,7 +6,11 @@ from stam import AnnotationStore, Offset, Selector
 from stam_annotator.config import OPF_DIR
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 from stam_annotator.opf_annotations_loader import create_opf_annotation_instance
-from stam_annotator.utility import get_filename_without_extension, get_uuid
+from stam_annotator.utility import (
+    get_filename_without_extension,
+    get_uuid,
+    save_annotation_store,
+)
 
 
 def create_annotationstore(id: str):
@@ -59,8 +63,7 @@ def annotation_pipeline(
 
     output_file_name = get_filename_without_extension(annotation_yaml_path)
     output_file_path = OPF_DIR / f"{output_file_name}.json"
-    store.set_filename(str(output_file_path))
-    store.save()
+    save_annotation_store(store, output_file_path)
 
 
 if __name__ == "__main__":

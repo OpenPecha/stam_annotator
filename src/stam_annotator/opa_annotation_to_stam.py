@@ -6,7 +6,11 @@ from stam import AnnotationStore, Selector
 
 from stam_annotator.config import OPA_DIR
 from stam_annotator.opa_annotations_loader import create_opa_annotation_instance
-from stam_annotator.utility import get_filename_without_extension, get_uuid
+from stam_annotator.utility import (
+    get_filename_without_extension,
+    get_uuid,
+    save_annotation_store,
+)
 
 
 def create_annotationstore(id: str):
@@ -73,8 +77,7 @@ def segment_annotation_pipeline(
     # Save the store
     output_file_name = get_filename_without_extension(segment_yaml_path)
     output_file_path = Path(segment_yaml_path).parent / f"{output_file_name}.json"
-    store.set_filename(str(output_file_path))
-    store.save()
+    save_annotation_store(store, output_file_path)
 
 
 if __name__ == "__main__":
