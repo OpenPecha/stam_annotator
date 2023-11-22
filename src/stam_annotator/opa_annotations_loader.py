@@ -25,6 +25,11 @@ class SegmentPair(BaseModel):
     pair_id: str
     sources: Dict[str, str]
 
+    @field_validator("pair_id", mode="before")
+    @classmethod
+    def set_source_id(cls, v):
+        return v or get_uuid()
+
 
 class OpaAnnotation(BaseModel):
     segment_sources: Dict[str, SegmentSource]
