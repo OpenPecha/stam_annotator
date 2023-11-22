@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Dict, Iterator, Tuple
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from stam_annotator.config import OPA_DIR
 from stam_annotator.load_yaml_annotations import load_opa_annotations_from_yaml
+from stam_annotator.utility import get_uuid
 
 
 class SegmentSource(BaseModel):
@@ -13,6 +14,11 @@ class SegmentSource(BaseModel):
     relation: str
     lang: str
     base: str
+
+    @field_validator("source_id", mode="before")
+    @classmethod
+    def set_source_id(cls, v):
+        return v or get_uuid()
 
 
 class SegmentPair(BaseModel):
