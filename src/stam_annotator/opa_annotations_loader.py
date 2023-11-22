@@ -20,6 +20,13 @@ class SegmentSource(BaseModel):
     def set_source_id(cls, v):
         return v or get_uuid()
 
+    @field_validator("lang")
+    @classmethod
+    def validate_lang(cls, v):
+        if v not in ["bo", "en"]:
+            raise ValueError("Language must be either 'bo' or 'en'")
+        return v
+
 
 class SegmentPair(BaseModel):
     pair_id: str
