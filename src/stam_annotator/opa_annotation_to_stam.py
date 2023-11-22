@@ -6,7 +6,7 @@ from stam import AnnotationStore, Selector
 
 from stam_annotator.config import OPA_DIR
 from stam_annotator.opa_annotations_loader import create_opa_annotation_instance
-from stam_annotator.utility import get_filename_without_extension
+from stam_annotator.utility import get_filename_without_extension, get_uuid
 
 
 def create_annotationstore(id: str):
@@ -37,10 +37,10 @@ def segment_annotation_pipeline(
     segment_data = create_opa_annotation_instance(Path(segment_yaml_path))
 
     dataset = store.add_dataset(id="dataset")
-    dataset.add_key("translation")
+    first_key = next(iter(segment_data.segment_sources))
+    dataset.add_key(segment_data.segment_sources[first_key].type)
 
     # Create annotation
-    annotation_data_counter = 0
     for uuid, value in segment_data.segment_pairs.items():
         key = "translation"
 
@@ -62,10 +62,7 @@ def segment_annotation_pipeline(
         # converting to json string since this is the only format the package accepts
         annotation_value_json = json.dumps(annotation_value)
         # Add data to dataset
-        data = dataset.add_data(
-            key, annotation_value_json, f"D{annotation_data_counter}"
-        )
-        annotation_data_counter += 1
+        data = dataset.add_data(key, annotation_value_json, get_uuid())
 
         create_annotation(
             store=store,

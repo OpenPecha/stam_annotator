@@ -37,12 +37,6 @@ def test_create_annotation_loader():
             assert start == 16444
             assert end == 16444
 
-    # print(f"id: {annotation_doc.id}")
-    # print(f"annotation_type: {annotation_doc.annotation_type}")
-    # print(f"revision: {annotation_doc.revision}")
-    # for uuid, value in annotation_doc.annotations.items():
-    #     print(f"uuid: {uuid}, start:{value.span.start} - end:{value.span.end}")
-
 
 if __name__ == "__main__":
     test_create_annotation_loader()

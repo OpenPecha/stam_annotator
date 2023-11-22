@@ -1,59 +1,76 @@
 from pathlib import Path
 from typing import Dict, Iterator, Tuple
 
+from pydantic import BaseModel, field_validator
+
 from stam_annotator.config import OPA_DIR
 from stam_annotator.load_yaml_annotations import load_opa_annotations_from_yaml
+from stam_annotator.utility import get_uuid
 
 
-class SegmentSource:
-    def __init__(self, source_id: str, type: str, relation: str, lang: str, base: str):
-        self.source_id = source_id
-        self.type = type
-        self.relation = relation
-        self.lang = lang
-        self.base = base
+class SegmentSource(BaseModel):
+    source_id: str
+    type: str
+    relation: str
+    lang: str
+    base: str
+
+    @field_validator("source_id", mode="before")
+    @classmethod
+    def set_source_id(cls, v):
+        return v or get_uuid()
+
+    @field_validator("relation")
+    @classmethod
+    def validate_relation(cls, v):
+        if v not in ["source", "target"]:
+            raise ValueError("Relation must be either 'source' or 'target'")
+        return v
+
+    @field_validator("lang")
+    @classmethod
+    def validate_lang(cls, v):
+        if v not in ["bo", "en"]:
+            raise ValueError("Language must be either 'bo' or 'en'")
+        return v
 
 
-class SegmentPair:
-    def __init__(self, pair_id: str, sources: Dict[str, str]):
-        self.pair_id = pair_id
-        self.sources = sources
+class SegmentPair(BaseModel):
+    pair_id: str
+    sources: Dict[str, str]
+
+    @field_validator("pair_id", mode="before")
+    @classmethod
+    def set_source_id(cls, v):
+        return v or get_uuid()
 
 
-class SegmentData:
-    def __init__(
-        self,
-        segment_sources: Dict[str, SegmentSource],
-        segment_pairs: Dict[str, SegmentPair],
-    ):
-        self.segment_sources = segment_sources
-        self.segment_pairs = segment_pairs
+class OpaAnnotation(BaseModel):
+    segment_sources: Dict[str, SegmentSource]
+    segment_pairs: Dict[str, SegmentPair]
 
-    @staticmethod
-    def from_dict(data: Dict) -> "SegmentData":
-        sources = {
-            id: SegmentSource(id, **details)
-            for id, details in data.get("segment_sources", {}).items()
+    @classmethod
+    def __init__(self, segment_sources: Dict, segment_pairs: Dict):
+        self.segment_sources = {
+            id: SegmentSource(source_id=id, **details)
+            for id, details in segment_sources.items()
         }
-        pairs = {
-            id: SegmentPair(id, {key: value for key, value in pair.items()})
-            for id, pair in data.get("segment_pairs", {}).items()
+        self.segment_pairs = {
+            id: SegmentPair(pair_id=id, sources=value)
+            for id, value in segment_pairs.items()
         }
-        return SegmentData(segment_sources=sources, segment_pairs=pairs)
 
     def items(self) -> Iterator[Tuple[str, SegmentPair]]:
         return iter(self.segment_pairs.items())
 
 
-def create_opa_annotation_instance(yaml_path: Path) -> SegmentData:
-
+def create_opa_annotation_instance(yaml_path: Path) -> OpaAnnotation:
     data = load_opa_annotations_from_yaml(yaml_path)
-    return SegmentData.from_dict(data)
+    return OpaAnnotation(data["segment_sources"], data["segment_pairs"])
 
 
 if __name__ == "__main__":
     file_path = OPA_DIR / "36CA.yml"
-
-    segment_data = create_opa_annotation_instance(file_path)
-    for pair_id, pair in segment_data.items():
+    opa_annotation = create_opa_annotation_instance(file_path)
+    for pair_id, pair in opa_annotation.items():
         print(f"Pair ID: {pair_id}, Sources: {pair.sources}")
