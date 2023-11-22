@@ -1,6 +1,7 @@
 import yaml
 
 from stam_annotator.config import OPF_DIR
+from stam_annotator.utility import get_uuid
 
 
 def load_opf_annotations_from_yaml(yaml_file):
@@ -12,8 +13,9 @@ def load_opf_annotations_from_yaml(yaml_file):
         data["annotations"] = {}
     elif isinstance(data["annotations"], list):
         # Convert list to dictionary with index-based keys or some form of UUIDs
+        annotation_id = get_uuid()
         data["annotations"] = {
-            f"{index}": item for index, item in enumerate(data["annotations"])
+            f"{annotation_id}": item for index, item in enumerate(data["annotations"])
         }
 
     return data
