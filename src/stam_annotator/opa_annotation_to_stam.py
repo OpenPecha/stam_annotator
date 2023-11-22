@@ -37,7 +37,8 @@ def segment_annotation_pipeline(
     segment_data = create_opa_annotation_instance(Path(segment_yaml_path))
 
     dataset = store.add_dataset(id="dataset")
-    dataset.add_key("translation")
+    first_key = next(iter(segment_data.segment_sources))
+    dataset.add_key(segment_data.segment_sources[first_key].type)
 
     # Create annotation
     for uuid, value in segment_data.segment_pairs.items():
