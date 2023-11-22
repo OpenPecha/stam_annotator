@@ -20,6 +20,13 @@ class SegmentSource(BaseModel):
     def set_source_id(cls, v):
         return v or get_uuid()
 
+    @field_validator("relation")
+    @classmethod
+    def validate_relation(cls, v):
+        if v not in ["source", "target"]:
+            raise ValueError("Relation must be either 'source' or 'target'")
+        return v
+
     @field_validator("lang")
     @classmethod
     def validate_lang(cls, v):
