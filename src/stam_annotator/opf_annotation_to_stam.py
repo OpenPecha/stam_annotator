@@ -13,8 +13,10 @@ def create_annotationstore(id: str):
     return AnnotationStore(id=id)
 
 
-def create_resource(store: AnnotationStore, id: str, text: str):
-    return store.add_resource(id=id, text=text)
+def create_resource(store: AnnotationStore, text_file_path: Path):
+    text = text_file_path.read_text(encoding="utf-8")
+    resource_id = get_filename_without_extension(text_file_path)
+    return store.add_resource(id=resource_id, text=text)
 
 
 def create_dataset(store: AnnotationStore, id: str, key: str):
@@ -36,13 +38,9 @@ def annotation_pipeline(
     # Create annotation store
     store = create_annotationstore(id=annotationstore_id)
     # Create resource
-    text_file_path = Path(text_file_path)
-    text = text_file_path.read_text(encoding="utf-8")
-    resource_id = get_filename_without_extension(text_file_path)
-    resource = create_resource(store=store, id=resource_id, text=text)
+    resource = create_resource(store=store, text_file_path=Path(text_file_path))
     # Create dataset
-    yaml_file_path = Path(annotation_yaml_path)
-    yaml_data = load_opf_annotations_from_yaml(yaml_file_path)
+    yaml_data = load_opf_annotations_from_yaml(Path(annotation_yaml_path))
     annotation_doc = create_opf_annotation_instance(yaml_data)
 
     dataset = create_dataset(store=store, id=annotation_doc.id, key=dataset_key)
@@ -59,7 +57,7 @@ def annotation_pipeline(
             data=data,
         )
 
-    output_file_name = get_filename_without_extension(yaml_file_path)
+    output_file_name = get_filename_without_extension(annotation_yaml_path)
     output_file_path = OPF_DIR / f"{output_file_name}.json"
     store.set_filename(str(output_file_path))
     store.save()
