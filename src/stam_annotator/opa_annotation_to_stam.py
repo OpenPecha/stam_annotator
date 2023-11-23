@@ -1,16 +1,27 @@
-import json
 from pathlib import Path
-from typing import Union
+from typing import List, Union
 
+from pydantic import BaseModel, Field
 from stam import AnnotationStore, Selector
 
 from stam_annotator.config import OPA_DIR
-from stam_annotator.opa_annotations_loader import create_opa_annotation_instance
+from stam_annotator.opa_annotations_loader import (
+    SegmentSource,
+    create_opa_annotation_instance,
+)
 from stam_annotator.utility import (
     get_filename_without_extension,
     get_uuid,
     save_annotation_store,
 )
+
+
+class AnnotationData(SegmentSource):
+    offset: str
+
+
+class AnnotationDataContainer(BaseModel):
+    annotation_data_list: List[AnnotationData] = Field(default_factory=list)
 
 
 def create_annotationstore(id: str):
@@ -48,23 +59,25 @@ def segment_annotation_pipeline(
     for uuid, value in segment_data.segment_pairs.items():
         key = "translation"
 
-        annotation_value = []
-        for segment_id, segment_value in value.sources.items():
+        annotation_data_container = AnnotationDataContainer()
+        for segment_id, offset in value.sources.items():
             for source_id, source_value in segment_data.segment_sources.items():
                 if source_id == segment_id:
-                    value_dict = {
-                        "base": source_value.base,
-                        "lang": source_value.lang,
-                        "relation": source_value.relation,
-                        "source_id": source_id,
-                        "type": source_value.type,
-                        "offset": segment_value,
-                    }
+                    annot_data_obj = AnnotationData(
+                        source_id=source_value.source_id,
+                        type=source_value.type,
+                        base=source_value.base,
+                        lang=source_value.lang,
+                        relation=source_value.relation,
+                        offset=offset,
+                    )
 
-                    annotation_value.append(value_dict)
+                    annotation_data_container.annotation_data_list.append(
+                        annot_data_obj
+                    )
 
         # converting to json string since this is the only format the package accepts
-        annotation_value_json = json.dumps(annotation_value)
+        annotation_value_json = annotation_data_container.model_dump_json()
         # Add data to dataset
         data = dataset.add_data(key, annotation_value_json, get_uuid())
 
