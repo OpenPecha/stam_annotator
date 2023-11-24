@@ -15,7 +15,7 @@ def load_stam_from_json(file_path: Union[str, Path]) -> AnnotationStore:
 def get_annotation_data_set(store: AnnotationStore, key: str) -> AnnotationDataSet:
     for data_set in store.datasets():
         for data_set_key in data_set.keys():
-            if data_set_key.__str__() == key:
+            if data_set_key == data_set.key(key):
                 return data_set
 
     return None
