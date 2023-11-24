@@ -48,10 +48,14 @@ def annotation_pipeline(
     annotation_doc = create_opf_annotation_instance(yaml_data)
 
     dataset = create_dataset(store=store, id=annotation_doc.id, key=dataset_key)
+
+    unique_uuid = get_uuid()
     # Create annotation
     for id, value in annotation_doc.annotations.items():
 
-        data = dataset.add_data(dataset_key, annotation_doc.annotation_type, get_uuid())
+        data = dataset.add_data(
+            dataset_key, annotation_doc.annotation_type, unique_uuid
+        )
         create_annotation(
             store=store,
             id=id,
@@ -70,7 +74,7 @@ if __name__ == "__main__":
     # Define your file paths and other parameters
     annotationstore_id = "P000218_Volume_1"
     text_file_path = OPF_DIR / "v001.txt"
-    annotation_yaml_path = OPF_DIR / "Author.yml"
+    annotation_yaml_path = OPF_DIR / "Quotation.yml"
     dataset_key = "Structure Type"
 
     # Run the pipeline
