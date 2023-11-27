@@ -92,7 +92,7 @@ def add_annotation_data_to_data_set(
         data_set.annotation_datas.append(annotation_data)
 
 
-def opf_annotation_to_stam_model(
+def opf_annotation_to_annotation_store_format(
     opf_annot: OpfAnnotation, data_set_key: KeyEnum
 ) -> Annotation_Store:
     store_id = get_uuid()
@@ -122,5 +122,5 @@ if __name__ == "__main__":
 
     opf_obj = create_opf_annotation_instance(opf_data_dict)
     data_set_key = KeyEnum.structure_type
-    stam_model = opf_annotation_to_stam_model(opf_obj, data_set_key)
+    stam_model = opf_annotation_to_annotation_store_format(opf_obj, data_set_key)
     print(stam_model)
