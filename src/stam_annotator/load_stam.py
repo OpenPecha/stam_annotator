@@ -1,4 +1,3 @@
-from enum import Enum
 from pathlib import Path
 from typing import Union
 
@@ -6,6 +5,7 @@ import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
 from stam_annotator.config import OPF_DIR
+from stam_annotator.enums import KeyEnum, ValueEnum
 
 
 def load_stam_from_json(file_path: Union[str, Path]) -> AnnotationStore:
@@ -20,19 +20,6 @@ def get_annotation_data_set(store: AnnotationStore, key: str) -> AnnotationDataS
                 return data_set
 
     return None
-
-
-class ValueEnum(Enum):
-    author = "Author"
-    book_title = "BookTitle"
-    chapter = "Chapter"
-    quotation = "Quotation"
-    sabche = "Sabche"
-    tsawa = "Tsawa"
-
-
-class KeyEnum(Enum):
-    structure_type = "Structure Type"
 
 
 def get_annotations(

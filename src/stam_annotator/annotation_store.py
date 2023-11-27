@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel, Field, field_validator
 
 from stam_annotator.config import OPF_DIR
-from stam_annotator.load_stam import KeyEnum, ValueEnum
+from stam_annotator.enums import KeyEnum, ValueEnum
 from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
 from stam_annotator.opf_annotations_loader import (
     OpfAnnotation,
