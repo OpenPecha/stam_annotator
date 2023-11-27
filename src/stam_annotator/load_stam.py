@@ -1,3 +1,4 @@
+from enum import Enum
 from pathlib import Path
 from typing import Union
 
@@ -21,16 +22,34 @@ def get_annotation_data_set(store: AnnotationStore, key: str) -> AnnotationDataS
     return None
 
 
-def get_annotations(store: AnnotationStore, key: str, value: str) -> Annotations:
-    data_set = get_annotation_data_set(store, key)
-    data_key = data_set.key(key)
-    return data_set.data(filter=data_key, value=value).annotations()
+class ValueEnum(Enum):
+    author = "Author"
+    book_title = "BookTitle"
+    chapter = "Chapter"
+    quotation = "Quotation"
+    sabche = "Sabche"
+    tsawa = "Tsawa"
+
+
+class KeyEnum(Enum):
+    structure_type = "Structure Type"
+
+
+def get_annotations(
+    store: AnnotationStore, key: KeyEnum, value: ValueEnum
+) -> Annotations:
+    data_set = get_annotation_data_set(store, key.value)
+    data_key = data_set.key(key.value)
+    return data_set.data(filter=data_key, value=value.value).annotations()
 
 
 if __name__ == "__main__":
     file_path = OPF_DIR / "Sabche.json"
     store = load_stam_from_json(file_path)
-    annotations = get_annotations(store, "Structure Type", "Sabche")
+
+    value_instance = ValueEnum.tsawa
+    key_instance = KeyEnum.structure_type
+    annotations = get_annotations(store, key_instance, value_instance)
     for annotation in store.annotations():
         # get the text to which this annotation refers (if any)
         try:
