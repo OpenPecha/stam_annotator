@@ -43,20 +43,38 @@ def combine_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> AnnotationSt
 
     # transfer datasets
     for dataset in stam2.datasets():
+        key = next(dataset.keys(), None)
+        if not key:
+            continue
+        # if the data set already exists
+        if get_annotation_data_set(stam1, key.id()):
+            continue
+
         new_dataset = stam1.add_dataset(id=dataset.id())
-        for key in dataset.keys():
-            new_dataset.add_key(key.id())
+        new_dataset.add_key(key.id())
 
     # transfer annotations
     for annotation in stam2.annotations():
         annotation_data = next(annotation.__iter__(), None)
         if not annotation_data:
             continue
+
+        """
+        if the associated data set already exists, then data_set_id of already existing is used
+        with annotation,
+        else data set id of new is used.
+
+        """
+
+        annotation_data_key = annotation_data.key().id()
+        data_set = get_annotation_data_set(stam1, annotation_data_key)
+        data_set_id = data_set.id() if data_set else annotation_data.dataset().id()
+
         data = {
             "id": annotation_data.id(),
-            "key": annotation_data.key().id(),
+            "key": annotation_data_key,
             "value": annotation_data.value().get(),
-            "set": annotation_data.dataset().id(),
+            "set": data_set_id,
         }
         stam1.annotate(id=annotation.id(), target=annotation.select(), data=data)
     return stam1
