@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union
+from typing import List, Sequence, Union
 
 import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
@@ -12,6 +12,12 @@ from stam_annotator.utility import save_annotation_store
 def load_stam_from_json(file_path: Union[str, Path]) -> AnnotationStore:
     file_path = str(file_path)
     return stam.AnnotationStore(file=file_path)
+
+
+def load_multiple_stam_from_json(
+    file_paths: Sequence[Union[str, Path]]
+) -> List[AnnotationStore]:
+    return [load_stam_from_json(file_path) for file_path in file_paths]
 
 
 def get_annotation_data_set(store: AnnotationStore, key: str) -> AnnotationDataSet:
@@ -31,7 +37,21 @@ def get_annotations(
     return data_set.data(filter=data_key, value=value.value).annotations()
 
 
-def combine_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> AnnotationStore:
+def combine_stams(stams: List[AnnotationStore]) -> AnnotationStore:
+    """
+    This function combines multiple stams into one.
+    It requires at least two STAM objects in the list to proceed.
+    """
+    if len(stams) < 2:
+        raise ValueError("At least two STAM objects are required.")
+
+    stam1 = stams[0]
+    for stam2 in stams[1:]:
+        stam1 = combine_two_stam(stam1, stam2)
+    return stam1
+
+
+def combine_two_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> AnnotationStore:
 
     """
     In this function, all the resources, data set and annotations are being transfered from
@@ -81,9 +101,11 @@ def combine_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> AnnotationSt
 
 
 if __name__ == "__main__":
-    file_path = OPF_DIR / "Author.json"
-    stam1 = load_stam_from_json(file_path)
-    file_path = OPF_DIR / "Sabche.json"
-    stam2 = load_stam_from_json(file_path)
-    stam3 = combine_stam(stam1, stam2)
-    save_annotation_store(stam3, OPF_DIR / "combined.json")
+    file_path1 = OPF_DIR / "Author.json"
+    file_path2 = OPF_DIR / "Sabche.json"
+    file_path3 = OPF_DIR / "BookTitle.json"
+
+    file_paths = [file_path1, file_path2, file_path3]
+    stams = load_multiple_stam_from_json(file_paths)
+    store = combine_stams(stams)
+    save_annotation_store(store, OPF_DIR / "combined.json")
