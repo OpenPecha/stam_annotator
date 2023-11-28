@@ -4,7 +4,7 @@ from typing import Dict, Iterator, Tuple
 from pydantic import BaseModel, field_validator
 
 from stam_annotator.config import OPA_DIR
-from stam_annotator.load_yaml_annotations import load_opa_annotations_from_yaml
+from stam_annotator.load_yaml import load_opa_annotations_from_yaml
 from stam_annotator.utility import get_uuid
 
 

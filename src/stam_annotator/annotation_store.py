@@ -5,8 +5,8 @@ from pydantic import BaseModel, Field, field_validator
 
 from stam_annotator.config import OPF_DIR
 from stam_annotator.enums import KeyEnum, ValueEnum
-from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
-from stam_annotator.opf_annotations_loader import (
+from stam_annotator.load_yaml import load_opf_annotations_from_yaml
+from stam_annotator.opf_loader import (
     OpfAnnotation,
     Span,
     create_opf_annotation_instance,

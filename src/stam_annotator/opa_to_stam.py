@@ -5,10 +5,7 @@ from pydantic import BaseModel, Field
 from stam import AnnotationStore, Selector
 
 from stam_annotator.config import OPA_DIR
-from stam_annotator.opa_annotations_loader import (
-    SegmentSource,
-    create_opa_annotation_instance,
-)
+from stam_annotator.opa_loader import SegmentSource, create_opa_annotation_instance
 from stam_annotator.utility import (
     get_filename_without_extension,
     get_uuid,

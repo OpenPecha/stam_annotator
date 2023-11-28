@@ -6,8 +6,8 @@ from stam_annotator.annotation_store import (
 )
 from stam_annotator.config import OPF_DIR
 from stam_annotator.enums import KeyEnum
-from stam_annotator.load_yaml_annotations import load_opf_annotations_from_yaml
-from stam_annotator.opf_annotations_loader import create_opf_annotation_instance
+from stam_annotator.load_yaml import load_opf_annotations_from_yaml
+from stam_annotator.opf_loader import create_opf_annotation_instance
 from stam_annotator.utility import save_annotation_store
 
 
