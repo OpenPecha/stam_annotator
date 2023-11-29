@@ -4,7 +4,7 @@ from stam import AnnotationStore, Offset, Selector
 
 from stam_annotator.annotation_store import (
     Annotation_Store,
-    opf_annotation_to_annotation_store_format,
+    convert_opf_for_pre_stam_format,
 )
 from stam_annotator.config import OPF_DIR
 from stam_annotator.enums import KeyEnum
@@ -71,7 +71,7 @@ def opf_to_stam_pipeline(
     opf_data_dict = load_opf_annotations_from_yaml(opf_yml_file_path)
     opf_obj = create_opf_annotation_instance(opf_data_dict)
 
-    opf_annotation_store = opf_annotation_to_annotation_store_format(
+    opf_annotation_store = convert_opf_for_pre_stam_format(
         opf_obj, annotation_type_key, resource_file_path
     )
     opf_stam = opf_annotation_store_to_stam(annotation_store=opf_annotation_store)

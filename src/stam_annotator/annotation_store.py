@@ -108,22 +108,29 @@ def add_annotation_data_to_data_set(
         data_set.annotation_datas.append(annotation_data)
 
 
-def opf_annotation_to_annotation_store_format(
+def convert_opf_for_pre_stam_format(
     opf_annot: OpfAnnotation,
-    data_set_key: KeyEnum,
+    annotation_type_key: KeyEnum,
     resource_file_path: Union[str, Path],
 ) -> Annotation_Store:
+    """
+    Convert opf annotation to annotation store for pre-stam format.
+    class Annotation_Store is defined with format that is  compatible with stam.
+    """
+
     store_id = get_uuid()
     annotation_store = Annotation_Store(store_id=store_id)
     resource = create_resource(resource_file_path)
     annotation_store.add_resource(resource)
 
-    data_set = create_data_set(data_set_id=opf_annot.id, data_set_key=data_set_key)
+    data_set = create_data_set(
+        data_set_id=opf_annot.id, data_set_key=annotation_type_key
+    )
     annotation_store.add_data_set(data_set)
 
     annotation_data = Annotation_Data(
         annotation_data_id=get_uuid(),
-        annotation_data_key=data_set_key,
+        annotation_data_key=annotation_type_key,
         annotation_data_value=opf_annot.annotation_type,
         store_id=store_id,
     )
@@ -147,7 +154,7 @@ if __name__ == "__main__":
 
     opf_obj = create_opf_annotation_instance(opf_data_dict)
     data_set_key = KeyEnum.structure_type
-    stam_model = opf_annotation_to_annotation_store_format(
+    stam_model = convert_opf_for_pre_stam_format(
         opf_obj, data_set_key, resource_file_path
     )
     print(stam_model)
