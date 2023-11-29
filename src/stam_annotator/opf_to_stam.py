@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from stam import AnnotationStore, Offset, Selector
 
 from stam_annotator.annotation_store import (
@@ -63,19 +65,28 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
     return store
 
 
+def opf_to_stam_pipeline(
+    opf_yml_file_path: Path, resource_file_path: Path, annotation_type_key: KeyEnum
+):
+    opf_data_dict = load_opf_annotations_from_yaml(opf_yml_file_path)
+    opf_obj = create_opf_annotation_instance(opf_data_dict)
+
+    opf_annotation_store = opf_annotation_to_annotation_store_format(
+        opf_obj, annotation_type_key, resource_file_path
+    )
+    opf_stam = opf_annotation_store_to_stam(annotation_store=opf_annotation_store)
+    return opf_stam
+
+
 if __name__ == "__main__":
     # Define your file paths and other parameters
     resource_file_path = OPF_DIR / "v001.txt"
-    annotation_yaml_path = OPF_DIR / "Author.yml"
+    opf_yaml_file_path = OPF_DIR / "Author.yml"
 
-    opf_data_dict = load_opf_annotations_from_yaml(annotation_yaml_path)
-
-    opf_obj = create_opf_annotation_instance(opf_data_dict)
-    data_set_key = KeyEnum.structure_type
-    annotation_store = opf_annotation_to_annotation_store_format(
-        opf_obj, data_set_key, resource_file_path
+    annotation_type_key = KeyEnum.structure_type
+    opf_stam = opf_to_stam_pipeline(
+        opf_yaml_file_path, resource_file_path, annotation_type_key
     )
-    stam_store_object = opf_annotation_store_to_stam(annotation_store=annotation_store)
 
-    output_file_path = OPF_DIR / "stam.json"
-    save_annotation_store(stam_store_object, output_file_path)
+    output_file_path = OPF_DIR / "Author.json"
+    save_annotation_store(opf_stam, output_file_path)
