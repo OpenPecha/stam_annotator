@@ -17,6 +17,11 @@ class ValueEnum(Enum):
     sabche = "Sabche"
     tsawa = "Tsawa"
 
+    correction = "Correction"
+    pagination = "Pagination"
+    error_candidate = "ErrorCandidate"
+    peydurma = "Peydurma"
+
 
 class KeyEnum(Enum):
     structure_type = "Structure Type"
