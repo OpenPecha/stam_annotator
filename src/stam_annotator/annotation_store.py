@@ -4,13 +4,16 @@ from typing import List, Union
 from pydantic import BaseModel, Field, field_validator
 
 from stam_annotator.definations import OPF_DIR, KeyEnum, ValueEnum
-from stam_annotator.load_yaml import load_opf_annotations_from_yaml
 from stam_annotator.opf_loader import (
     OpfAnnotation,
     Span,
     create_opf_annotation_instance,
 )
-from stam_annotator.utility import get_filename_without_extension, get_uuid
+from stam_annotator.utility import (
+    get_filename_without_extension,
+    get_uuid,
+    load_opf_annotations_from_yaml,
+)
 
 
 class Annotation_Data(BaseModel):

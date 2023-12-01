@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Union
 from uuid import uuid4
 
+import yaml
 from stam import AnnotationStore
 
 
@@ -16,6 +17,29 @@ def is_json_file_path(file_path: Path) -> bool:
 
 def get_uuid():
     return uuid4().hex
+
+
+def load_opf_annotations_from_yaml(yaml_file):
+    with open(yaml_file) as f:
+        data = yaml.safe_load(f)
+
+    # Check if 'annotations' key exists in the data
+    if "annotations" not in data:
+        data["annotations"] = {}
+    elif isinstance(data["annotations"], list):
+        # Convert list to dictionary with index-based keys or some form of UUIDs
+        annotation_id = get_uuid()
+        data["annotations"] = {
+            f"{annotation_id}": item for index, item in enumerate(data["annotations"])
+        }
+
+    return data
+
+
+def load_opa_annotations_from_yaml(yaml_file):
+    with open(yaml_file) as f:
+        data = yaml.safe_load(f)
+    return data
 
 
 def save_annotation_store(store: AnnotationStore, output_file_path: Union[str, Path]):

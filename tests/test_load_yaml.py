@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from stam_annotator.load_yaml import load_opf_annotations_from_yaml
+from stam_annotator.utility import load_opf_annotations_from_yaml
 
 
 def test_load_opf_annotations_from_yaml():
