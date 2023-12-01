@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
@@ -21,6 +21,7 @@ class Span(BaseModel):
 class Annotation(BaseModel):
     id: str
     span: Span
+    payloads: Optional[Dict[str, Any]] = None  # field for additional metadata
 
     @field_validator("id", mode="before")
     @classmethod
@@ -36,7 +37,11 @@ class Annotations(BaseModel):
             annotations_processed = {}
         else:
             annotations_processed = {
-                id: Annotation(id=id, span=Span(**value["span"]))
+                id: Annotation(
+                    id=id,
+                    span=Span(**value["span"]),
+                    payloads={k: v for k, v in value.items() if k != "span"},
+                )
                 for id, value in annotations.items()
             }
         super().__init__(annotations_dict=annotations_processed)
@@ -87,10 +92,10 @@ def create_opf_annotation_instance(data: Dict) -> OpfAnnotation:
 
 
 if __name__ == "__main__":
-    opf_yml_data = load_opf_annotations_from_yaml(OPF_DIR / "Quotation.yml")
+    opf_yml_data = load_opf_annotations_from_yaml(OPF_DIR / "ErrorCandidate.yml")
     opf_annotation = create_opf_annotation_instance(opf_yml_data)
     print(f"id: {opf_annotation.id}")
     print(f"annotation_type: {opf_annotation.annotation_type}")
     print(f"revision: {opf_annotation.revision}")
     for id, value in opf_annotation.annotations.items():
-        print(f"id: {id}, start: {value.span.start} - end: {value.span.end}")
+        print(f"id: {id}, value: {value}")
