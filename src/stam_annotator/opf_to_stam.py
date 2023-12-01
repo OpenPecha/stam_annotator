@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict, List
 
 from stam import AnnotationStore, Offset, Selector
 
@@ -8,7 +9,11 @@ from stam_annotator.annotation_store import (
 )
 from stam_annotator.definations import OPF_DIR, KeyEnum
 from stam_annotator.opf_loader import create_opf_annotation_instance
-from stam_annotator.utility import load_opf_annotations_from_yaml, save_annotation_store
+from stam_annotator.utility import (
+    get_uuid,
+    load_opf_annotations_from_yaml,
+    save_annotation_store,
+)
 
 
 def create_annotationstore(id: str):
@@ -25,7 +30,9 @@ def create_dataset(store: AnnotationStore, id: str, key: KeyEnum):
     return dataset
 
 
-def create_annotation(store: AnnotationStore, id: str, target: Selector, data: dict):
+def create_annotation(
+    store: AnnotationStore, id: str, target: Selector, data: List[Dict]
+):
     return store.annotate(id=id, target=target, data=data)
 
 
@@ -51,7 +58,7 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
             annotation_data.annotation_data_value.value,
             annotation_data.annotation_data_id,
         )
-        create_annotation(
+        stam_annotation = create_annotation(
             store=store,
             id=annotation.annotation_id,
             target=Selector.textselector(
@@ -59,6 +66,20 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
                 Offset.simple(annotation.span.start, annotation.span.end),
             ),
             data=data,
+        )
+
+        # Creating annotation for meta data
+        if not annotation.payloads:
+            continue
+
+        create_annotation(
+            store=store,
+            target=Selector.annotationselector(stam_annotation),
+            data=[
+                {"id": get_uuid(), "key": key, "value": value, "set": dataset.id()}
+                for key, value in annotation.payloads.items()
+            ],
+            id=get_uuid(),
         )
     return store
 
@@ -79,12 +100,12 @@ def opf_to_stam_pipeline(
 if __name__ == "__main__":
     # Define your file paths and other parameters
     resource_file_path = OPF_DIR / "v001.txt"
-    opf_yaml_file_path = OPF_DIR / "Author.yml"
+    opf_yaml_file_path = OPF_DIR / "Correction.yml"
 
     annotation_type_key = KeyEnum.structure_type
     opf_stam = opf_to_stam_pipeline(
         opf_yaml_file_path, resource_file_path, annotation_type_key
     )
 
-    output_file_path = OPF_DIR / "Author.json"
+    output_file_path = OPF_DIR / "Correction.json"
     save_annotation_store(opf_stam, output_file_path)
