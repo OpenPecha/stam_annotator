@@ -1,6 +1,6 @@
 import yaml
 
-from stam_annotator.config import OPF_DIR
+from stam_annotator.definations import OPF_DIR
 from stam_annotator.utility import get_uuid
 
 

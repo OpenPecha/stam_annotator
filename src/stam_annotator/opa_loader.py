@@ -3,7 +3,7 @@ from typing import Dict
 
 from pydantic import BaseModel, field_validator
 
-from stam_annotator.config import OPA_DIR
+from stam_annotator.definations import OPA_DIR
 from stam_annotator.load_yaml import load_opa_annotations_from_yaml
 from stam_annotator.utility import save_json_file
 

@@ -2,7 +2,7 @@ from typing import Dict
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
-from stam_annotator.config import OPF_DIR
+from stam_annotator.definations import OPF_DIR
 from stam_annotator.load_yaml import load_opf_annotations_from_yaml
 from stam_annotator.utility import get_uuid
 

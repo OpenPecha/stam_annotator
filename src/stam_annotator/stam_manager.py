@@ -4,8 +4,7 @@ from typing import List, Sequence, Union
 import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
-from stam_annotator.config import OPF_DIR
-from stam_annotator.enums import KeyEnum, ValueEnum
+from stam_annotator.definations import OPF_DIR, KeyEnum, ValueEnum
 from stam_annotator.utility import save_annotation_store
 
 
