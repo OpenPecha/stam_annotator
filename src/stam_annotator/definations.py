@@ -8,6 +8,9 @@ DATA_DIR = ROOT_DIR / "data"
 OPF_DIR = DATA_DIR / "opf"
 OPA_DIR = DATA_DIR / "opa"
 
+OPF_BO_DIR = OPF_DIR / "bo"
+OPF_EN_DIR = OPF_DIR / "en"
+
 
 class ValueEnum(Enum):
     author = "Author"
@@ -21,6 +24,8 @@ class ValueEnum(Enum):
     pagination = "Pagination"
     error_candidate = "ErrorCandidate"
     peydurma = "Peydurma"
+
+    segment = "Segment"
 
 
 class KeyEnum(Enum):
