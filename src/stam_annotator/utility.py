@@ -19,6 +19,13 @@ def get_uuid():
     return uuid4().hex
 
 
+def read_json_to_dict(file_path: Path) -> Dict:
+    if not is_json_file_path(file_path):
+        raise ValueError(f"The file path must lead to a JSON file. Given: {file_path}")
+    with open(file_path, encoding="utf-8") as file:
+        return json.load(file)
+
+
 def load_opf_annotations_from_yaml(yaml_file):
     with open(yaml_file) as f:
         data = yaml.safe_load(f)
