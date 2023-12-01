@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -34,6 +34,7 @@ class Annotation(BaseModel):
     span: Span
     annotation_data: Annotation_Data
     resource_id: str
+    payloads: Optional[Dict[str, Any]] = None  # field for additional metadata
 
 
 class Annotation_Data_Set(BaseModel):
@@ -93,13 +94,18 @@ def create_data_set(data_set_id: str, data_set_key: KeyEnum):
 
 
 def create_annotation(
-    annotation_id: str, span: Span, annotation_data: Annotation_Data, resource_id: str
+    annotation_id: str,
+    span: Span,
+    annotation_data: Annotation_Data,
+    resource_id: str,
+    payloads: Optional[Dict[str, Any]],
 ):
     return Annotation(
         annotation_id=annotation_id,
         span=span,
         annotation_data=annotation_data,
         resource_id=resource_id,
+        payloads=payloads,
     )
 
 
@@ -143,6 +149,7 @@ def convert_opf_for_pre_stam_format(
             span=annotation.span,
             annotation_data=annotation_data,
             resource_id=resource.resource_id,
+            payloads=annotation.payloads,
         )
         annotation_store.add_annotation(annotation)
 
@@ -150,7 +157,7 @@ def convert_opf_for_pre_stam_format(
 
 
 if __name__ == "__main__":
-    segment_yaml_path = OPF_DIR / "Sabche.yml"
+    segment_yaml_path = OPF_DIR / "Correction.yml"
     resource_file_path = OPF_DIR / "v001.txt"
     opf_data_dict = load_opf_annotations_from_yaml(segment_yaml_path)
 
