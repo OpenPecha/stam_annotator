@@ -4,8 +4,14 @@ from typing import List, Sequence, Union
 import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
-from stam_annotator.definations import OPF_DIR, KeyEnum, ValueEnum
-from stam_annotator.utility import save_annotation_store
+from stam_annotator.definations import (
+    OPA_DIR,
+    OPF_BO_DIR,
+    OPF_EN_DIR,
+    KeyEnum,
+    ValueEnum,
+)
+from stam_annotator.opa_loader import OpaAnnotation, create_opa_annotation_instance
 
 
 def load_stam_from_json(file_path: Union[str, Path]) -> AnnotationStore:
@@ -99,12 +105,38 @@ def combine_two_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> Annotati
     return stam1
 
 
-if __name__ == "__main__":
-    file_path1 = OPF_DIR / "Author.json"
-    file_path2 = OPF_DIR / "Sabche.json"
-    file_path3 = OPF_DIR / "BookTitle.json"
+def get_alignment_annotations(
+    opa_annot: OpaAnnotation,
+    bo_opf: AnnotationStore,
+    en_opf: AnnotationStore,
+    key: KeyEnum,
+    value: ValueEnum,
+) -> Annotations:
+    """
+    This function returns the annotations of the given key and value from the alignment
+    annotation store.
+    """
+    for _, segment in opa_annot.segment_pairs.items():
+        for source_id, segment_source in opa_annot.segment_sources.items():
+            language = segment_source.lang
+            if language == "bo":
+                bo_offset = segment[source_id]
+                bo_annotation = bo_opf.annotation(bo_offset)
+                print(bo_annotation)
+            elif language == "en":
+                en_offset = segment[source_id]
+                en_annotation = en_opf.annotation(en_offset)
+                print(en_annotation)
+            else:
+                raise ValueError("The language is not supported.")
 
-    file_paths = [file_path1, file_path2, file_path3]
-    stams = load_multiple_stam_from_json(file_paths)
-    store = combine_stams(stams)
-    save_annotation_store(store, OPF_DIR / "combined.json")
+
+if __name__ == "__main__":
+    opa_stam = create_opa_annotation_instance(OPA_DIR / "36CA.json")
+    print(type(opa_stam))
+    bo_opf = load_stam_from_json(OPF_BO_DIR / "Segment.json")
+    en_opf = load_stam_from_json(OPF_EN_DIR / "Segment.json")
+
+    get_alignment_annotations(
+        opa_stam, bo_opf, en_opf, KeyEnum.structure_type, ValueEnum.segment
+    )
