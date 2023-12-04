@@ -30,12 +30,12 @@ def get_annotation_data_set(store: AnnotationStore, key: str) -> AnnotationDataS
 
 
 def get_annotations(
-    store: AnnotationStore, key: KeyEnum, value: ValueEnum
+    store: AnnotationStore, key: KeyEnum, value: ValueEnum, include_payload: bool = True
 ) -> Annotations:
     data_set = get_annotation_data_set(store, key.value)
     data_key = data_set.key(key.value)
     annotations = data_set.data(filter=data_key, value=value.value).annotations()
-    return convert_opf_stam_annotation_to_dictionary(annotations)
+    return convert_opf_stam_annotation_to_dictionary(annotations, include_payload)
 
 
 def combine_stams(stams: List[AnnotationStore]) -> AnnotationStore:

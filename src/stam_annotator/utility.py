@@ -76,17 +76,16 @@ def save_json_file(data: Dict, output_file_path: Union[str, Path]):
         json.dump(data, f, indent=4)
 
 
-def convert_opf_stam_annotation_to_dictionary(annotations: Annotations) -> Dict:
+def convert_opf_stam_annotation_to_dictionary(
+    annotations: Annotations, include_payload: bool = True
+) -> Dict:
     """
     This function converts the annotation object to a dictionary.
     """
     annotation_dict = {}
     for annotation in annotations:
         # get the text to which this annotation refers (if any)
-        try:
-            text = str(annotation)
-        except stam.StamError:
-            text = "n/a"
+        text = str(annotation) if not isinstance(annotation, stam.StamError) else "n/a"
         for data in annotation:
             annotation_dict[annotation.id()] = {
                 "id": annotation.id(),
@@ -94,4 +93,13 @@ def convert_opf_stam_annotation_to_dictionary(annotations: Annotations) -> Dict:
                 "value": str(data.value()),
                 "text": text,
             }
+            if include_payload:
+                payload_dictionary = {}
+                for annot in annotation.annotations():
+                    for data in annot:
+                        payload_dictionary[data.key().id()] = {
+                            "id": annot.id(),
+                            "value": str(data.value()),
+                        }
+                annotation_dict[annotation.id()]["payload"] = payload_dictionary
     return annotation_dict
