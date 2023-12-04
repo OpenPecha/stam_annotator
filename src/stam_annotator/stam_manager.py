@@ -4,14 +4,9 @@ from typing import List, Sequence, Union
 import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
-from stam_annotator.definations import (
-    OPA_DIR,
-    OPF_BO_DIR,
-    OPF_EN_DIR,
-    KeyEnum,
-    ValueEnum,
-)
-from stam_annotator.opa_loader import OpaAnnotation, create_opa_annotation_instance
+from stam_annotator.definations import OPF_WITH_PAYLOAD, KeyEnum, ValueEnum
+from stam_annotator.opa_loader import OpaAnnotation
+from stam_annotator.utility import convert_opf_stam_annotation_to_dictionary
 
 
 def load_stam_from_json(file_path: Union[str, Path]) -> AnnotationStore:
@@ -39,7 +34,8 @@ def get_annotations(
 ) -> Annotations:
     data_set = get_annotation_data_set(store, key.value)
     data_key = data_set.key(key.value)
-    return data_set.data(filter=data_key, value=value.value).annotations()
+    annotations = data_set.data(filter=data_key, value=value.value).annotations()
+    return convert_opf_stam_annotation_to_dictionary(annotations)
 
 
 def combine_stams(stams: List[AnnotationStore]) -> AnnotationStore:
@@ -128,9 +124,8 @@ def get_alignment_annotations(
 
 
 if __name__ == "__main__":
-    opa_stam = create_opa_annotation_instance(OPA_DIR / "36CA.json")
-    print(type(opa_stam))
-    bo_opf = load_stam_from_json(OPF_BO_DIR / "Segment.json")
-    en_opf = load_stam_from_json(OPF_EN_DIR / "Segment.json")
-
-    get_alignment_annotations(opa_stam, bo_opf, en_opf)
+    opf_stam = load_stam_from_json(OPF_WITH_PAYLOAD / "Correction.json")
+    annotations = get_annotations(
+        opf_stam, KeyEnum.structure_type, ValueEnum.correction
+    )
+    print(annotations)

@@ -3,8 +3,9 @@ from pathlib import Path
 from typing import Dict, Union
 from uuid import uuid4
 
+import stam
 import yaml
-from stam import AnnotationStore
+from stam import Annotations, AnnotationStore
 
 
 def get_filename_without_extension(file_path: Union[str, Path]):
@@ -73,3 +74,24 @@ def save_json_file(data: Dict, output_file_path: Union[str, Path]):
 
     with open(output_file_path, "w") as f:
         json.dump(data, f, indent=4)
+
+
+def convert_opf_stam_annotation_to_dictionary(annotations: Annotations) -> Dict:
+    """
+    This function converts the annotation object to a dictionary.
+    """
+    annotation_dict = {}
+    for annotation in annotations:
+        # get the text to which this annotation refers (if any)
+        try:
+            text = str(annotation)
+        except stam.StamError:
+            text = "n/a"
+        for data in annotation:
+            annotation_dict[annotation.id()] = {
+                "id": annotation.id(),
+                "key": data.key().id(),
+                "value": str(data.value()),
+                "text": text,
+            }
+    return annotation_dict
