@@ -4,8 +4,14 @@ from typing import List, Sequence, Union
 import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
-from stam_annotator.definations import OPF_WITH_PAYLOAD, KeyEnum, ValueEnum
-from stam_annotator.opa_loader import OpaAnnotation
+from stam_annotator.definations import (
+    OPA_DIR,
+    OPF_BO_DIR,
+    OPF_EN_DIR,
+    KeyEnum,
+    ValueEnum,
+)
+from stam_annotator.opa_loader import OpaAnnotation, create_opa_annotation_from_json
 from stam_annotator.utility import convert_opf_stam_annotation_to_dictionary
 
 
@@ -102,30 +108,34 @@ def combine_two_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> Annotati
 
 
 def get_alignment_annotations(
-    opa_annot: OpaAnnotation, bo_opf: AnnotationStore, en_opf: AnnotationStore
-) -> Annotations:
+    opa_alignment: OpaAnnotation,
+    opf_annotations: List[AnnotationStore],
+):
     """
     This function returns the annotations of the given key and value from the alignment
     annotation store.
     """
-    for _, segment in opa_annot.segment_pairs.items():
-        for source_id, segment_source in opa_annot.segment_sources.items():
-            language = segment_source.lang
-            if language == "bo":
-                bo_offset = segment[source_id]
-                bo_annotation = bo_opf.annotation(bo_offset)
-                print(bo_annotation)
-            elif language == "en":
-                en_offset = segment[source_id]
-                en_annotation = en_opf.annotation(en_offset)
-                print(en_annotation)
-            else:
-                raise ValueError("The language is not supported.")
+    alignment_sources = list(opa_alignment.segment_sources.keys())
+    for segment_id, segment in opa_alignment.segment_pairs.items():
+        # Get if all the sources are present in the segment
+        if not all(source in segment for source in alignment_sources):
+            raise ValueError("The alignment is not complete.")
+            break
+
+        # get the annotation
+        for source_id, segment_offset in segment.items():
+            for opf_annot in opf_annotations:
+                try:
+                    if opf_annot.annotation(segment_offset):
+                        print(opf_annot.annotation(segment_offset))
+                        break
+                except:  # noqa
+                    pass
 
 
 if __name__ == "__main__":
-    opf_stam = load_stam_from_json(OPF_WITH_PAYLOAD / "Correction.json")
-    annotations = get_annotations(
-        opf_stam, KeyEnum.structure_type, ValueEnum.correction
-    )
-    print(annotations)
+    opa_annot = create_opa_annotation_from_json(OPA_DIR / "36CA.json")
+    bo_opf = load_stam_from_json(OPF_BO_DIR / "Segment.json")
+    en_opf = load_stam_from_json(OPF_EN_DIR / "Segment.json")
+
+    get_alignment_annotations(opa_annot, [bo_opf, en_opf])
