@@ -27,9 +27,24 @@ def read_json_to_dict(file_path: Path) -> Dict:
         return json.load(file)
 
 
+def convert_none_to_null_in_annotations(data):
+    """
+    if a value is null in yml file, it will be converted to None in python.
+    and None has no value to show in annotation, so this convert None to
+    string type 'null'.
+    """
+    if "annotations" in data and isinstance(data["annotations"], dict):
+        for key, value in data["annotations"].items():
+            data["annotations"][key] = {
+                k: "null" if v is None else v for k, v in value.items()
+            }
+    return data
+
+
 def load_opf_annotations_from_yaml(yaml_file):
     with open(yaml_file) as f:
         data = yaml.safe_load(f)
+        data = convert_none_to_null_in_annotations(data)
 
     # Check if 'annotations' key exists in the data
     if "annotations" not in data:
