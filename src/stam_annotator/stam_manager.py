@@ -106,11 +106,7 @@ def combine_two_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> Annotati
 
 
 def get_alignment_annotations(
-    opa_annot: OpaAnnotation,
-    bo_opf: AnnotationStore,
-    en_opf: AnnotationStore,
-    key: KeyEnum,
-    value: ValueEnum,
+    opa_annot: OpaAnnotation, bo_opf: AnnotationStore, en_opf: AnnotationStore
 ) -> Annotations:
     """
     This function returns the annotations of the given key and value from the alignment
@@ -137,6 +133,4 @@ if __name__ == "__main__":
     bo_opf = load_stam_from_json(OPF_BO_DIR / "Segment.json")
     en_opf = load_stam_from_json(OPF_EN_DIR / "Segment.json")
 
-    get_alignment_annotations(
-        opa_stam, bo_opf, en_opf, KeyEnum.structure_type, ValueEnum.segment
-    )
+    get_alignment_annotations(opa_stam, bo_opf, en_opf)
