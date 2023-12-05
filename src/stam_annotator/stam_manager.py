@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from typing import List, Sequence, Union
 
@@ -38,10 +39,20 @@ def get_annotation_data_set(store: AnnotationStore, key: str) -> AnnotationDataS
 def get_annotations(
     store: AnnotationStore, key: KeyEnum, value: ValueEnum, include_payload: bool = True
 ) -> Annotations:
+    start_time = time.time()
+
     data_set = get_annotation_data_set(store, key.value)
     data_key = data_set.key(key.value)
     annotations = data_set.data(filter=data_key, value=value.value).annotations()
-    return convert_opf_stam_annotation_to_dictionary(annotations, include_payload)
+
+    annotations = convert_opf_stam_annotation_to_dictionary(
+        annotations, include_payload
+    )
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Time taken: {elapsed_time:.2f} seconds")
+
+    return annotations
 
 
 def combine_stams(stams: List[AnnotationStore]) -> AnnotationStore:
@@ -115,22 +126,35 @@ def get_alignment_annotations(
     This function returns the annotations of the given key and value from the alignment
     annotation store.
     """
+
+    start_time = time.time()
     alignment_sources = list(opa_alignment.segment_sources.keys())
+
+    alignment_annotations = {}
     for segment_id, segment in opa_alignment.segment_pairs.items():
         # Get if all the sources are present in the segment
         if not all(source in segment for source in alignment_sources):
             raise ValueError("The alignment is not complete.")
-            break
 
         # get the annotation
+        current_annotation = {}
         for source_id, segment_offset in segment.items():
             for opf_annot in opf_annotations:
                 try:
                     if opf_annot.annotation(segment_offset):
-                        print(opf_annot.annotation(segment_offset))
+                        language = opa_alignment.segment_sources[source_id].lang
+                        current_annotation[language] = str(
+                            opf_annot.annotation(segment_offset)
+                        )
                         break
                 except:  # noqa
                     pass
+        alignment_annotations[segment_id] = current_annotation
+    end_time = time.time()  # End timing
+    elapsed_time = end_time - start_time
+    print(f"Time taken: {elapsed_time:.2f} seconds")
+
+    return alignment_annotations
 
 
 if __name__ == "__main__":
@@ -138,4 +162,4 @@ if __name__ == "__main__":
     bo_opf = load_stam_from_json(OPF_BO_DIR / "Segment.json")
     en_opf = load_stam_from_json(OPF_EN_DIR / "Segment.json")
 
-    get_alignment_annotations(opa_annot, [bo_opf, en_opf])
+    alignment_annot = get_alignment_annotations(opa_annot, [bo_opf, en_opf])
