@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-from stam_annotator.definations import OPA_DIR, ORGANIZATION
+from stam_annotator.definations import ORGANIZATION
 from stam_annotator.github_token import GITHUB_TOKEN
 from stam_annotator.utility import (
     get_json_alignment,
@@ -27,7 +27,7 @@ class Alignment:
 
     @property
     def alignment_fn(self):
-        return self.base_path
+        return self.base_path / f"{self.id_}.opa.json"
 
     def load_alignment(self):
         with open(self.alignment_fn, encoding="utf-8") as file:
@@ -59,5 +59,5 @@ class Alignment:
 
 
 if __name__ == "__main__":
-    alignment = Alignment("A0B609189", OPA_DIR / "36CA.json")
+    alignment = Alignment.from_id("A0B609189")
     print(alignment)

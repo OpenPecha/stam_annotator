@@ -139,7 +139,10 @@ def json_alignment_exists_in_repo(organization, repo_name, token):
 
 def get_json_alignment(organization, repo_name, token):
     repo_files = get_files_from_opa_repo(organization, repo_name, token)
-    json_alignment = next(file.name == f"{repo_name}.opa.json" for file in repo_files)
+    json_alignment = next(
+        file for file in repo_files if file.name == f"{repo_name}.opa.json"
+    )
+
     Path(CUR_DIR / json_alignment.name).write_text(json_alignment.decoded_content)
 
     return CUR_DIR
@@ -147,11 +150,10 @@ def get_json_alignment(organization, repo_name, token):
 
 def make_json_alignment(organization, repo_name, token):
     """get yml alignment from github repo and convert it to json"""
-    g = Github(token)
-    repo = g.get_repo(f"{organization}/{repo_name}")
-    repo_files = repo.get_contents(f"{repo_name}.opa")
-    yml_alignment = next(file.name != "meta.yml" for file in repo_files)
-    json_content = json.dumps(yml_alignment.decoded_content, indent=4)
+    repo_files = get_files_from_opa_repo(organization, repo_name, token)
+    yml_alignment = next(file for file in repo_files if file.name != "meta.yml")
+    yml_content = yaml.safe_load(yml_alignment.decoded_content.decode())
+    json_content = json.dumps(yml_content, indent=4)
     Path(CUR_DIR / f"{repo_name}.opa.json").write_text(json_content)
 
     return CUR_DIR
