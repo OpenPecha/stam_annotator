@@ -14,6 +14,9 @@ OPF_EN_DIR = OPF_DIR / "en"
 OPF_WITH_PAYLOAD = DATA_DIR / "opf_with_payload"
 
 
+ORGANIZATION = "OpenPecha-Data"
+
+
 class ValueEnum(Enum):
     author = "Author"
     book_title = "BookTitle"

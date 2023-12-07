@@ -123,14 +123,35 @@ def convert_opf_stam_annotation_to_dictionary(
     return annotation_dict
 
 
-def get_repo(organization, repo_name, token):
+def get_files_from_opa_repo(organization, repo_name, token):
     g = Github(token)
     repo = g.get_repo(f"{organization}/{repo_name}")
-    contents = repo.get_contents(f"{repo_name}.opa")
-    for yml_file in contents:
-        if yml_file.name != "meta.yml":
-            file_content = repo.get_contents(yml_file.path).decoded_content
-            with open(CUR_DIR / f"{repo_name}.opa.yml", "wb") as file:
-                file.write(file_content)
-            break
+    repo_files = repo.get_contents(f"{repo_name}.opa")
+    return repo_files
+
+
+def json_alignment_exists_in_repo(organization, repo_name, token):
+    repo_files = get_files_from_opa_repo(organization, repo_name, token)
+    if any(file.name == f"{repo_name}.opa.json" for file in repo_files):
+        return True
+    return False
+
+
+def get_json_alignment(organization, repo_name, token):
+    repo_files = get_files_from_opa_repo(organization, repo_name, token)
+    json_alignment = next(file.name == f"{repo_name}.opa.json" for file in repo_files)
+    Path(CUR_DIR / json_alignment.name).write_text(json_alignment.decoded_content)
+
+    return CUR_DIR
+
+
+def make_json_alignment(organization, repo_name, token):
+    """get yml alignment from github repo and convert it to json"""
+    g = Github(token)
+    repo = g.get_repo(f"{organization}/{repo_name}")
+    repo_files = repo.get_contents(f"{repo_name}.opa")
+    yml_alignment = next(file.name != "meta.yml" for file in repo_files)
+    json_content = json.dumps(yml_alignment.decoded_content, indent=4)
+    Path(CUR_DIR / f"{repo_name}.opa.json").write_text(json_content)
+
     return CUR_DIR
