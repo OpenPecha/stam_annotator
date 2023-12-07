@@ -5,7 +5,10 @@ from uuid import uuid4
 
 import stam
 import yaml
+from github import Github
 from stam import Annotations, AnnotationStore
+
+from stam_annotator.definations import CUR_DIR
 
 
 def get_filename_without_extension(file_path: Union[str, Path]):
@@ -118,3 +121,16 @@ def convert_opf_stam_annotation_to_dictionary(
                         }
                 annotation_dict[annotation.id()]["payload"] = payload_dictionary
     return annotation_dict
+
+
+def get_repo(organization, repo_name, token):
+    g = Github(token)
+    repo = g.get_repo(f"{organization}/{repo_name}")
+    contents = repo.get_contents(f"{repo_name}.opa")
+    for yml_file in contents:
+        if yml_file.name != "meta.yml":
+            file_content = repo.get_contents(yml_file.path).decoded_content
+            with open(CUR_DIR / f"{repo_name}.opa.yml", "wb") as file:
+                file.write(file_content)
+            break
+    return CUR_DIR
