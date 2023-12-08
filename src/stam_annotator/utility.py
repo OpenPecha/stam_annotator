@@ -12,7 +12,7 @@ from stam_annotator.definations import CUR_DIR
 
 
 def get_filename_without_extension(file_path: Union[str, Path]):
-    return Path(file_path).stem
+    return Path(str(file_path)).stem
 
 
 def is_json_file_path(file_path: Path) -> bool:
@@ -151,9 +151,35 @@ def get_json_alignment(organization, repo_name, token):
 def make_json_alignment(organization, repo_name, token):
     """get yml alignment from github repo and convert it to json"""
     repo_files = get_files_from_opa_repo(organization, repo_name, token)
-    yml_alignment = next(file for file in repo_files if file.name != "meta.yml")
-    yml_content = yaml.safe_load(yml_alignment.decoded_content.decode())
-    json_content = json.dumps(yml_content, indent=4)
-    Path(CUR_DIR / f"{repo_name}.opa.json").write_text(json_content)
+    opa_yml = next(file for file in repo_files if file.name != "meta.yml")
+    opa_yml_content = yaml.safe_load(opa_yml.decoded_content.decode())
+    opa_json = json.dumps(opa_yml_content, indent=4)
+    Path(CUR_DIR / f"{repo_name}.opa.json").write_text(opa_json)
+
+    return CUR_DIR
+
+
+def get_files_from_opf_repo(organization, repo_name, token):
+    g = Github(token)
+    repo = g.get_repo(f"{organization}/{repo_name}")
+    base_files = repo.get_contents(rf"{repo_name}.opf/base")
+    layer_files = repo.get_contents(rf"{repo_name}.opf/layers/767E")
+    return base_files, layer_files
+
+
+def stam_annotation_exists_in_repo(organization, repo_name, token):
+    _, layer_files = get_files_from_opf_repo(organization, repo_name, token)
+    if any(file.name == f"{repo_name}.opf.json" for file in layer_files):
+        return True
+    return False
+
+
+def get_stam_annotation(organization, repo_name, token):
+    _, layer_files = get_files_from_opf_repo(organization, repo_name, token)
+    stam_annotation = next(
+        file for file in layer_files if file.name == f"{repo_name}.opf.json"
+    )
+
+    Path(CUR_DIR / stam_annotation.name).write_text(stam_annotation.decoded_content)
 
     return CUR_DIR
