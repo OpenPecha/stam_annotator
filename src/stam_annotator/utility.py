@@ -163,7 +163,9 @@ def get_files_from_opf_repo(organization, repo_name, token):
     g = Github(token)
     repo = g.get_repo(f"{organization}/{repo_name}")
     base_files = repo.get_contents(rf"{repo_name}.opf/base")
-    layer_files = repo.get_contents(rf"{repo_name}.opf/layers/767E")
+    inner_layer = repo.get_contents(rf"{repo_name}.opf/layers")
+    layer_files = repo.get_contents(inner_layer[0].path)
+
     return base_files, layer_files
 
 

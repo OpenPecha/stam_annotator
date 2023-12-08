@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+from stam import AnnotationStore
+
 from stam_annotator.definations import ORGANIZATION
 from stam_annotator.github_token import GITHUB_TOKEN
 from stam_annotator.opf_to_stam import make_stam_annotation
@@ -18,10 +20,14 @@ class Pecha:
     def __init__(self, id_: str, base_path: Path):
         self.id_ = id_
         self.base_path = base_path
+        self.stam_ = self.load_stam()
 
     @property
     def pecha_fn(self):
-        return self.base_path / f"{self.id_}.opf.json"
+        return str(self.base_path / f"{self.id_}.opf.json")
+
+    def load_stam(self):
+        return AnnotationStore(file=self.pecha_fn)
 
     @classmethod
     def from_id(cls, id_: str) -> "Pecha":
@@ -32,6 +38,9 @@ class Pecha:
 
         cls.base_path = make_stam_annotation(ORGANIZATION, id_, GITHUB_TOKEN)
         return cls(id_, cls.base_path)
+
+    def get_annotation(self, id_: str) -> str:
+        return self.stam_.annotation(id_).text()
 
 
 class Alignment:
@@ -83,3 +92,5 @@ class Alignment:
 
 if __name__ == "__main__":
     alignment = Alignment.from_id("A0B609189")
+    for segment_pair in alignment.get_segment_pairs():
+        print(segment_pair)
