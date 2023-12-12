@@ -35,3 +35,4 @@ class ValueEnum(Enum):
 
 class KeyEnum(Enum):
     structure_type = "Structure Type"
+    translation = "Translation"
