@@ -12,7 +12,34 @@ from stam_annotator.definations import ROOT_DIR
 from stam_annotator.github_token import GITHUB_TOKEN
 
 
-class Repo:
+class PechaRepo:
+    pecha_id: str
+    source_org: str
+    destination_org: str
+
+    def __init__(self, id_: str, source_org: str, destination_org: str):
+        self.pecha_id = id_
+        self.source_org = source_org
+        self.destination_org = destination_org
+        self.base_path = make_local_folder(ROOT_DIR / self.pecha_id)
+        self.get_pecha_repo()
+
+    def get_pecha_repo(self):
+        try:
+            org, repo_name, token = self.source_org, self.pecha_id, GITHUB_TOKEN
+            """make a inner folder with source org name and clone the repo in it"""
+            destination_folder = self.base_path / org
+            repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
+            subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
+            print(
+                f"Repository {repo_name} cloned successfully into {destination_folder}"
+            )
+
+        except subprocess.CalledProcessError as e:
+            print(f"Error cloning {repo_name} repository: {e}")
+
+
+class AlignmentRepo:
     alignment_id: str
     source_org: str
     destination_org: str
@@ -22,6 +49,15 @@ class Repo:
         self.source_org = source_org
         self.destination_org = destination_org
         self.base_path = make_local_folder(ROOT_DIR / self.alignment_id)
+
+    @property
+    def alignment_repo_fn(self):
+        return (
+            self.base_path
+            / f"{self.destination_org}"
+            / f"{self.alignment_id}.opa"
+            / "meta.json"
+        )
 
     def get_alignment_repo(self):
         try:
@@ -57,6 +93,13 @@ class Repo:
 
                 shutil.copy(parent_dir / doc, new_parent_dir / doc)
                 continue
+
+    def get_related_pechas(self):
+        with open(self.alignment_repo_fn, encoding="utf-8") as file:
+            data = json.load(file)
+        pechas = data["pechas"]
+        for pecha_id in pechas:
+            PechaRepo(pecha_id, self.source_org, self.destination_org)
 
 
 def make_local_folder(destination_folder: Path) -> Path:
@@ -106,6 +149,7 @@ class CustomEncoder(JSONEncoder):
 
 
 if __name__ == "__main__":
-    repo = Repo("AB3CAED2A", "OpenPecha-Data", "tenzin3")
-    repo.get_alignment_repo()
-    repo.convert_alignment_repo_to_json()
+    repo = AlignmentRepo("AB3CAED2A", "OpenPecha-Data", "tenzin3")
+    # repo.get_alignment_repo()
+    # repo.convert_alignment_repo_to_json()
+    repo.get_related_pechas()
