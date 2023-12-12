@@ -50,13 +50,9 @@ class Repo:
                     make_local_folder(new_parent_dir / doc)
                     continue
                 if doc.endswith(".yml"):
-                    yml_content = Path(parent_dir / doc).read_text(encoding="utf-8")
-                    opa_json = json.dumps(
-                        yaml.safe_load(yml_content), indent=4, cls=CustomEncoder
-                    )
-                    Path(new_parent_dir / doc.replace(".yml", ".json")).write_text(
-                        opa_json
-                    )
+                    yml_file_path = parent_dir / doc
+                    json_file_path = new_parent_dir / doc.replace(".yml", ".json")
+                    convert_yml_file_to_json(yml_file_path, json_file_path)
                     continue
 
                 shutil.copy(parent_dir / doc, new_parent_dir / doc)
@@ -92,6 +88,14 @@ def replace_parent_folder_name(path: Path, old_name: str, new_name: str):
     return Path(new_path)
 
 
+def convert_yml_file_to_json(yml_file_path: Path, json_file_path: Path):
+    yml_content = yml_file_path.read_text(encoding="utf-8")
+    converted_json = json.dumps(
+        yaml.safe_load(yml_content), indent=4, cls=CustomEncoder
+    )
+    json_file_path.write_text(converted_json)
+
+
 class CustomEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
@@ -103,5 +107,5 @@ class CustomEncoder(JSONEncoder):
 
 if __name__ == "__main__":
     repo = Repo("AB3CAED2A", "OpenPecha-Data", "tenzin3")
-    # repo.get_alignment_repo()
+    repo.get_alignment_repo()
     repo.convert_alignment_repo_to_json()
