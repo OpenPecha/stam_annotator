@@ -1,46 +1,44 @@
 import json
+import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+from github import Github
 from stam import AnnotationStore
 
-from stam_annotator.definations import ORGANIZATION
+from stam_annotator.definations import ROOT_DIR
 from stam_annotator.github_token import GITHUB_TOKEN
-from stam_annotator.opf_to_stam import make_stam_annotation
-from stam_annotator.utility import (
-    get_json_alignment,
-    get_stam_annotation,
-    json_alignment_exists_in_repo,
-    make_json_alignment,
-    stam_annotation_exists_in_repo,
-)
+
+ORGANIZATION = "PechaData"
 
 
 class Pecha:
     def __init__(self, id_: str, base_path: Path):
         self.id_ = id_
         self.base_path = base_path
-        self.stam_ = self.load_stam()
+        self.stams: Dict[str, AnnotationStore] = {}
+        self.load_stams()
 
     @property
     def pecha_fn(self):
-        return str(self.base_path / f"{self.id_}.opf.json")
+        return self.base_path / f"{self.id_}.opf" / "layers"
 
-    def load_stam(self):
-        return AnnotationStore(file=self.pecha_fn)
+    def load_stams(self):
+        json_files = list(self.pecha_fn.glob("**/*.json"))
+        for json_file in json_files:
+            self.stams[json_file.parent.name] = AnnotationStore(file=str(json_file))
 
     @classmethod
-    def from_id(cls, id_: str) -> "Pecha":
-        """load if annotations exits, else create and load"""
-        if stam_annotation_exists_in_repo(ORGANIZATION, id_, GITHUB_TOKEN):
-            cls.base_path = get_stam_annotation(ORGANIZATION, id_, GITHUB_TOKEN)
+    def from_id(cls, id_: str):
+        """load if annotations exits"""
+        if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
+            cls.base_path = clone_repo(
+                ORGANIZATION, id_, GITHUB_TOKEN, destination_folder=ROOT_DIR / f"{id_}"
+            )
             return cls(id_, cls.base_path)
 
-        cls.base_path = make_stam_annotation(ORGANIZATION, id_, GITHUB_TOKEN)
-        return cls(id_, cls.base_path)
-
-    def get_annotation(self, id_: str) -> str:
-        return self.stam_.annotation(id_).text()
+    def get_annotation(self, id_: str, pecha_stam_name) -> str:
+        return self.stams[pecha_stam_name].annotation(id_).text()
 
 
 class Alignment:
@@ -55,7 +53,7 @@ class Alignment:
 
     @property
     def alignment_fn(self):
-        return self.base_path / f"{self.id_}.opa.json"
+        return str(self.base_path / f"{self.id_}.opa" / "9103.json")
 
     def load_alignment(self):
         with open(self.alignment_fn, encoding="utf-8") as file:
@@ -65,7 +63,7 @@ class Alignment:
 
         # load pechas
         for id_ in self.segment_source.keys():
-            self.pechas[id_] = Pecha.from_id(id_)
+            self.pechas[id_] = Pecha(id_, ROOT_DIR / id_)
 
     def get_segment_pairs(self):
         for id_ in self.segment_pairs:
@@ -75,22 +73,47 @@ class Alignment:
         segment_pair = []
         for pecha_id, segment_id in self.segment_pairs[id_].items():
             segment_lang = self.segment_source[pecha_id]["lang"]
-            segment_text = self.pechas[pecha_id].get_annotation(segment_id)
+            pecha_stam_name = self.segment_source[pecha_id]["base"]
+            segment_text = self.pechas[pecha_id].get_annotation(
+                segment_id, pecha_stam_name
+            )
             segment_pair.append((segment_text, segment_lang))
         return segment_pair
 
     @classmethod
-    def from_id(cls, id_: str) -> "Alignment":
-        """load if alignment exits, else create and load"""
-        if json_alignment_exists_in_repo(ORGANIZATION, id_, GITHUB_TOKEN):
-            cls.base_path = get_json_alignment(ORGANIZATION, id_, GITHUB_TOKEN)
+    def from_id(cls, id_: str):
+        """load if alignment exits"""
+        if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
+            cls.base_path = clone_repo(
+                ORGANIZATION, id_, GITHUB_TOKEN, destination_folder=ROOT_DIR / f"{id_}"
+            )
             return cls(id_, cls.base_path)
 
-        cls.base_path = make_json_alignment(ORGANIZATION, id_, GITHUB_TOKEN)
-        return cls(id_, cls.base_path)
+
+def check_repo_exists(token, org_name, repo_name):
+    g = Github(token)
+    try:
+        org = g.get_organization(org_name)
+        org.get_repo(repo_name)
+        return True
+    except Exception as e:
+        print(f"Error with repo {repo_name}: {e}")
+        return False
+
+
+def clone_repo(org, repo_name, token, destination_folder: Path):
+    try:
+        """make a inner folder with source org name and clone the repo in it"""
+        repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
+        subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
+        print(f"Repository {repo_name} cloned successfully into {destination_folder}")
+        return destination_folder
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error cloning {repo_name} repository: {e}")
 
 
 if __name__ == "__main__":
-    alignment = Alignment.from_id("A0B609189")
+    alignment = Alignment("AB3CAED2A", ROOT_DIR / "AB3CAED2A")
     for segment_pair in alignment.get_segment_pairs():
         print(segment_pair)

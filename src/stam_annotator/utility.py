@@ -5,10 +5,7 @@ from uuid import uuid4
 
 import stam
 import yaml
-from github import Github
 from stam import Annotations, AnnotationStore
-
-from stam_annotator.definations import CUR_DIR
 
 
 def get_filename_without_extension(file_path: Union[str, Path]):
@@ -121,67 +118,3 @@ def convert_opf_stam_annotation_to_dictionary(
                         }
                 annotation_dict[annotation.id()]["payload"] = payload_dictionary
     return annotation_dict
-
-
-def get_files_from_opa_repo(organization, repo_name, token):
-    g = Github(token)
-    repo = g.get_repo(f"{organization}/{repo_name}")
-    repo_files = repo.get_contents(f"{repo_name}.opa")
-    return repo_files
-
-
-def json_alignment_exists_in_repo(organization, repo_name, token):
-    repo_files = get_files_from_opa_repo(organization, repo_name, token)
-    if any(file.name == f"{repo_name}.opa.json" for file in repo_files):
-        return True
-    return False
-
-
-def get_json_alignment(organization, repo_name, token):
-    repo_files = get_files_from_opa_repo(organization, repo_name, token)
-    json_alignment = next(
-        file for file in repo_files if file.name == f"{repo_name}.opa.json"
-    )
-
-    Path(CUR_DIR / json_alignment.name).write_text(json_alignment.decoded_content)
-
-    return CUR_DIR
-
-
-def make_json_alignment(organization, repo_name, token):
-    """get yml alignment from github repo and convert it to json"""
-    repo_files = get_files_from_opa_repo(organization, repo_name, token)
-    opa_yml = next(file for file in repo_files if file.name != "meta.yml")
-    opa_yml_content = yaml.safe_load(opa_yml.decoded_content.decode())
-    opa_json = json.dumps(opa_yml_content, indent=4)
-    Path(CUR_DIR / f"{repo_name}.opa.json").write_text(opa_json)
-
-    return CUR_DIR
-
-
-def get_files_from_opf_repo(organization, repo_name, token):
-    g = Github(token)
-    repo = g.get_repo(f"{organization}/{repo_name}")
-    base_files = repo.get_contents(rf"{repo_name}.opf/base")
-    inner_layer = repo.get_contents(rf"{repo_name}.opf/layers")
-    layer_files = repo.get_contents(inner_layer[0].path)
-
-    return base_files, layer_files
-
-
-def stam_annotation_exists_in_repo(organization, repo_name, token):
-    _, layer_files = get_files_from_opf_repo(organization, repo_name, token)
-    if any(file.name == f"{repo_name}.opf.json" for file in layer_files):
-        return True
-    return False
-
-
-def get_stam_annotation(organization, repo_name, token):
-    _, layer_files = get_files_from_opf_repo(organization, repo_name, token)
-    stam_annotation = next(
-        file for file in layer_files if file.name == f"{repo_name}.opf.json"
-    )
-
-    Path(CUR_DIR / stam_annotation.name).write_text(stam_annotation.decoded_content)
-
-    return CUR_DIR
