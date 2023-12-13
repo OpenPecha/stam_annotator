@@ -14,17 +14,17 @@ from stam_annotator.opf_to_stam import opf_to_stam_pipeline
 from stam_annotator.stam_manager import combine_stams
 from stam_annotator.utility import save_annotation_store
 
+SOURCE_ORG = "OpenPecha-Data"
+
 
 class PechaRepo:
     pecha_id: str
     source_org: str
     destination_org: str
 
-    def __init__(
-        self, id_: str, source_org: str, destination_org: str, base_path: Path
-    ):
+    def __init__(self, id_: str, destination_org: str, base_path: Path):
         self.pecha_id = id_
-        self.source_org = source_org
+        self.source_org = SOURCE_ORG
         self.destination_org = destination_org
         self.base_path = base_path
 
@@ -33,9 +33,9 @@ class PechaRepo:
         return self.base_path / f"{self.source_org}"
 
     @classmethod
-    def from_id(cls, id_: str, source_org: str, destination_org: str) -> "PechaRepo":
+    def from_id(cls, id_: str, destination_org: str) -> "PechaRepo":
         cls.base_path = make_local_folder(ROOT_DIR / id_)
-        return PechaRepo(id_, source_org, destination_org, cls.base_path)
+        return PechaRepo(id_, destination_org, cls.base_path)
 
     def get_pecha_repo(self):
         try:
@@ -104,11 +104,9 @@ class AlignmentRepo:
     destination_org: str
     pechas: Dict[str, PechaRepo]
 
-    def __init__(
-        self, id_: str, source_org: str, destination_org: str, base_path: Path
-    ):
+    def __init__(self, id_: str, destination_org: str, base_path: Path):
         self.alignment_id = id_
-        self.source_org = source_org
+        self.source_org = SOURCE_ORG
         self.destination_org = destination_org
         self.base_path = base_path
         self.pecha_repos: Dict[str, PechaRepo] = {}
@@ -123,11 +121,9 @@ class AlignmentRepo:
         )
 
     @classmethod
-    def from_id(
-        cls, id_: str, source_org: str, destination_org: str
-    ) -> "AlignmentRepo":
+    def from_id(cls, id_: str, destination_org: str) -> "AlignmentRepo":
         cls.base_path = make_local_folder(ROOT_DIR / id_)
-        return AlignmentRepo(id_, source_org, destination_org, cls.base_path)
+        return AlignmentRepo(id_, destination_org, cls.base_path)
 
     def load_pecha_repos(self):
         with open(self.alignment_repo_fn, encoding="utf-8") as file:
@@ -135,7 +131,7 @@ class AlignmentRepo:
         pechas = data["pechas"]
         for pecha_id in pechas:
             self.pecha_repos[pecha_id] = PechaRepo.from_id(
-                pecha_id, self.source_org, self.destination_org
+                pecha_id, self.destination_org
             )
 
     def get_alignment_repo(self):
@@ -179,7 +175,7 @@ class AlignmentRepo:
         pechas = data["pechas"]
         for pecha_id in pechas:
             self.pecha_repos[pecha_id] = PechaRepo.from_id(
-                pecha_id, self.source_org, self.destination_org
+                pecha_id, self.destination_org
             )
             self.pecha_repos[pecha_id].get_pecha_repo()
 
@@ -232,16 +228,12 @@ class CustomEncoder(JSONEncoder):
 
 if __name__ == "__main__":
 
-    # repo = AlignmentRepo.from_id("AB3CAED2A", "OpenPecha-Data", "tenzin3")
+    # repo = AlignmentRepo.from_id("AB3CAED2A", "tenzin3")
     # repo.get_alignment_repo()
     # repo.convert_alignment_repo_to_json()
     # repo.get_related_pechas()
-    repo = AlignmentRepo(
-        "AB3CAED2A", "OpenPecha-Data", "tenzin3", ROOT_DIR / "AB3CAED2A"
-    )
+    repo = AlignmentRepo("AB3CAED2A", "tenzin3", ROOT_DIR / "AB3CAED2A")
     repo.load_pecha_repos()
     for pecha_id, pecha_repo in repo.pecha_repos.items():
-        pecha_repo = PechaRepo(
-            pecha_id, "OpenPecha-Data", "tenzin3", ROOT_DIR / pecha_id
-        )
+        pecha_repo = PechaRepo(pecha_id, "tenzin3", ROOT_DIR / pecha_id)
         pecha_repo.convert_pecha_repo_to_stam()
