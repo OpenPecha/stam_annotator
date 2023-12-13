@@ -16,6 +16,7 @@ from stam_annotator.stam_manager import combine_stams
 from stam_annotator.utility import save_annotation_store
 
 SOURCE_ORG = "OpenPecha-Data"
+DESTINATION_ORG = "PechaData"
 
 
 class PechaRepo:
@@ -23,10 +24,10 @@ class PechaRepo:
     source_org: str
     destination_org: str
 
-    def __init__(self, id_: str, destination_org: str, base_path: Path):
+    def __init__(self, id_: str, base_path: Path):
         self.pecha_id = id_
         self.source_org = SOURCE_ORG
-        self.destination_org = destination_org
+        self.destination_org = DESTINATION_ORG
         self.base_path = base_path
 
     @property
@@ -34,9 +35,9 @@ class PechaRepo:
         return self.base_path / f"{self.source_org}"
 
     @classmethod
-    def from_id(cls, id_: str, destination_org: str) -> "PechaRepo":
+    def from_id(cls, id_: str) -> "PechaRepo":
         cls.base_path = make_local_folder(ROOT_DIR / id_)
-        return PechaRepo(id_, destination_org, cls.base_path)
+        return PechaRepo(id_, cls.base_path)
 
     def get_pecha_repo(self):
         try:
@@ -99,11 +100,12 @@ class PechaRepo:
                 continue
 
     def upload_pecha_repo(self):
-        repo_is_created = create_github_repo(self.pecha_id, GITHUB_TOKEN)
+        org_name, repo_name = DESTINATION_ORG, self.pecha_id
+        repo_is_created = create_github_repo(org_name, repo_name, GITHUB_TOKEN)
         if repo_is_created:
             project_path = self.base_path / self.destination_org
             repo_name = self.pecha_id
-            upload_files_to_github_repo(repo_name, project_path, GITHUB_TOKEN)
+            upload_files_to_github_repo(org_name, repo_name, project_path, GITHUB_TOKEN)
             print(f"Pecha repo {repo_name} uploaded successfully")
 
 
@@ -113,10 +115,10 @@ class AlignmentRepo:
     destination_org: str
     pechas: Dict[str, PechaRepo]
 
-    def __init__(self, id_: str, destination_org: str, base_path: Path):
+    def __init__(self, id_: str, base_path: Path):
         self.alignment_id = id_
         self.source_org = SOURCE_ORG
-        self.destination_org = destination_org
+        self.destination_org = DESTINATION_ORG
         self.base_path = base_path
         self.pecha_repos: Dict[str, PechaRepo] = {}
 
@@ -130,18 +132,16 @@ class AlignmentRepo:
         )
 
     @classmethod
-    def from_id(cls, id_: str, destination_org: str) -> "AlignmentRepo":
+    def from_id(cls, id_: str) -> "AlignmentRepo":
         cls.base_path = make_local_folder(ROOT_DIR / id_)
-        return AlignmentRepo(id_, destination_org, cls.base_path)
+        return AlignmentRepo(id_, cls.base_path)
 
     def load_pecha_repos(self):
         with open(self.alignment_repo_fn, encoding="utf-8") as file:
             data = json.load(file)
         pechas = data["pechas"]
         for pecha_id in pechas:
-            self.pecha_repos[pecha_id] = PechaRepo.from_id(
-                pecha_id, self.destination_org
-            )
+            self.pecha_repos[pecha_id] = PechaRepo.from_id(pecha_id)
 
     def get_alignment_repo(self):
         try:
@@ -179,33 +179,29 @@ class AlignmentRepo:
                 continue
 
     def upload_alignment_repo(self):
-        repo_is_created = create_github_repo(self.alignment_id, GITHUB_TOKEN)
+        org_name, repo_name = DESTINATION_ORG, self.alignment_id
+        repo_is_created = create_github_repo(org_name, repo_name, GITHUB_TOKEN)
         if repo_is_created:
             project_path = self.base_path / self.destination_org
             repo_name = self.alignment_id
-            upload_files_to_github_repo(repo_name, project_path, GITHUB_TOKEN)
+            upload_files_to_github_repo(org_name, repo_name, project_path, GITHUB_TOKEN)
             print(f"Alignment repo {repo_name} uploaded successfully")
 
     def get_aligned_pechas(self):
-        with open(self.alignment_repo_fn, encoding="utf-8") as file:
-            data = json.load(file)
-        pechas = data["pechas"]
-        for pecha_id in pechas:
-            self.pecha_repos[pecha_id] = PechaRepo.from_id(
-                pecha_id, self.destination_org
-            )
-            self.pecha_repos[pecha_id].get_pecha_repo()
+        self.load_pecha_repos()
+        for _, pecha in self.pecha_repos.items():
+            pecha.get_pecha_repo()
 
     def upload_aligned_pechas(self):
         for _, pecha_repo in self.pecha_repos.items():
             pecha_repo.upload_pecha_repo()
 
 
-def create_github_repo(repo_name: str, token: str) -> bool:
+def create_github_repo(org_name: str, repo_name: str, token: str) -> bool:
     try:
         g = Github(token)
-        user = g.get_user()
-        user.create_repo(repo_name)
+        org = g.get_organization(org_name)
+        org.create_repo(repo_name)
         print(f"Repository {repo_name} created successfully")
         return True
     except:  # noqa
@@ -214,10 +210,14 @@ def create_github_repo(repo_name: str, token: str) -> bool:
 
 
 def upload_files_to_github_repo(
-    repo_name: str, project_path: Path, token: str, commit_message: str = "upload file"
+    org_name: str,
+    repo_name: str,
+    project_path: Path,
+    token: str,
+    commit_message: str = "upload file",
 ):
     g = Github(token)
-    repo = g.get_user().get_repo(repo_name)
+    repo = g.get_organization(org_name).get_repo(repo_name)
     for file in project_path.rglob("*"):
         if file.is_dir():
             continue
@@ -276,14 +276,14 @@ class CustomEncoder(JSONEncoder):
 
 if __name__ == "__main__":
 
-    # repo = AlignmentRepo.from_id("AB3CAED2A", "tenzin3")
+    # repo = AlignmentRepo.from_id("AB3CAED2A")
     # repo.get_alignment_repo()
     # repo.convert_alignment_repo_to_json()
     # repo.get_aligned_pechas()
     # for pecha_id, pecha_repo in repo.pecha_repos.items():
-    #     pecha_repo = PechaRepo(pecha_id, "tenzin3", ROOT_DIR / pecha_id)
+    #     pecha_repo = PechaRepo(pecha_id, ROOT_DIR / pecha_id)
     #     pecha_repo.convert_pecha_repo_to_stam()
-
-    repo = AlignmentRepo.from_id("AB3CAED2A", "tenzin3")
+    repo = AlignmentRepo("AB3CAED2A", ROOT_DIR / "AB3CAED2A")
+    # repo.upload_alignment_repo()
     repo.load_pecha_repos()
     repo.upload_aligned_pechas()
