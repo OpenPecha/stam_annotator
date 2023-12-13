@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Dict, List
 
 import yaml
+from github import Github
 
 from stam_annotator.definations import ROOT_DIR, KeyEnum
 from stam_annotator.github_token import GITHUB_TOKEN
@@ -97,6 +98,14 @@ class PechaRepo:
                 )
                 continue
 
+    def upload_pecha_repo(self):
+        repo_is_created = create_github_repo(self.pecha_id, GITHUB_TOKEN)
+        if repo_is_created:
+            project_path = self.base_path / self.destination_org
+            repo_name = self.pecha_id
+            upload_files_to_github_repo(repo_name, project_path, GITHUB_TOKEN)
+            print(f"Pecha repo {repo_name} uploaded successfully")
+
 
 class AlignmentRepo:
     alignment_id: str
@@ -169,7 +178,15 @@ class AlignmentRepo:
                 shutil.copy(parent_dir / doc, new_parent_dir / doc)
                 continue
 
-    def get_related_pechas(self):
+    def upload_alignment_repo(self):
+        repo_is_created = create_github_repo(self.alignment_id, GITHUB_TOKEN)
+        if repo_is_created:
+            project_path = self.base_path / self.destination_org
+            repo_name = self.alignment_id
+            upload_files_to_github_repo(repo_name, project_path, GITHUB_TOKEN)
+            print(f"Alignment repo {repo_name} uploaded successfully")
+
+    def get_aligned_pechas(self):
         with open(self.alignment_repo_fn, encoding="utf-8") as file:
             data = json.load(file)
         pechas = data["pechas"]
@@ -178,6 +195,37 @@ class AlignmentRepo:
                 pecha_id, self.destination_org
             )
             self.pecha_repos[pecha_id].get_pecha_repo()
+
+    def upload_aligned_pechas(self):
+        for _, pecha_repo in self.pecha_repos.items():
+            pecha_repo.upload_pecha_repo()
+
+
+def create_github_repo(repo_name: str, token: str) -> bool:
+    try:
+        g = Github(token)
+        user = g.get_user()
+        user.create_repo(repo_name)
+        print(f"Repository {repo_name} created successfully")
+        return True
+    except:  # noqa
+        print(f"Repo {repo_name} already exists")
+        return False
+
+
+def upload_files_to_github_repo(
+    repo_name: str, project_path: Path, token: str, commit_message: str = "upload file"
+):
+    g = Github(token)
+    repo = g.get_user().get_repo(repo_name)
+    for file in project_path.rglob("*"):
+        if file.is_dir():
+            continue
+        with open(file, encoding="utf-8") as f:
+            data = f.read()
+        """upload file to github repo """
+        relative_file_path = file.relative_to(project_path)
+        repo.create_file(str(relative_file_path), commit_message, data, branch="main")
 
 
 def make_local_folder(destination_folder: Path) -> Path:
@@ -231,9 +279,11 @@ if __name__ == "__main__":
     # repo = AlignmentRepo.from_id("AB3CAED2A", "tenzin3")
     # repo.get_alignment_repo()
     # repo.convert_alignment_repo_to_json()
-    # repo.get_related_pechas()
-    repo = AlignmentRepo("AB3CAED2A", "tenzin3", ROOT_DIR / "AB3CAED2A")
+    # repo.get_aligned_pechas()
+    # for pecha_id, pecha_repo in repo.pecha_repos.items():
+    #     pecha_repo = PechaRepo(pecha_id, "tenzin3", ROOT_DIR / pecha_id)
+    #     pecha_repo.convert_pecha_repo_to_stam()
+
+    repo = AlignmentRepo.from_id("AB3CAED2A", "tenzin3")
     repo.load_pecha_repos()
-    for pecha_id, pecha_repo in repo.pecha_repos.items():
-        pecha_repo = PechaRepo(pecha_id, "tenzin3", ROOT_DIR / pecha_id)
-        pecha_repo.convert_pecha_repo_to_stam()
+    repo.upload_aligned_pechas()
