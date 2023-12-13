@@ -111,7 +111,7 @@ class AlignmentRepo:
         self.source_org = source_org
         self.destination_org = destination_org
         self.base_path = base_path
-        self.pecha_repos = self.get_related_pechas()
+        self.pecha_repos: Dict[str, PechaRepo] = {}
 
     @property
     def alignment_repo_fn(self):
@@ -128,6 +128,15 @@ class AlignmentRepo:
     ) -> "AlignmentRepo":
         cls.base_path = make_local_folder(ROOT_DIR / id_)
         return AlignmentRepo(id_, source_org, destination_org, cls.base_path)
+
+    def load_pecha_repos(self):
+        with open(self.alignment_repo_fn, encoding="utf-8") as file:
+            data = json.load(file)
+        pechas = data["pechas"]
+        for pecha_id in pechas:
+            self.pecha_repos[pecha_id] = PechaRepo.from_id(
+                pecha_id, self.source_org, self.destination_org
+            )
 
     def get_alignment_repo(self):
         try:
@@ -169,12 +178,10 @@ class AlignmentRepo:
             data = json.load(file)
         pechas = data["pechas"]
         for pecha_id in pechas:
-            self.pechas[pecha_id] = PechaRepo(
-                pecha_id,
-                self.source_org,
-                self.destination_org,
-                ROOT_DIR / self.source_org / pecha_id,
+            self.pecha_repos[pecha_id] = PechaRepo.from_id(
+                pecha_id, self.source_org, self.destination_org
             )
+            self.pecha_repos[pecha_id].get_pecha_repo()
 
 
 def make_local_folder(destination_folder: Path) -> Path:
@@ -224,8 +231,17 @@ class CustomEncoder(JSONEncoder):
 
 
 if __name__ == "__main__":
-    pecha_repo = PechaRepo(
-        "I1A92E2D9", "OpenPecha-Data", "tenzin3", ROOT_DIR / "I1A92E2D9"
+
+    # repo = AlignmentRepo.from_id("AB3CAED2A", "OpenPecha-Data", "tenzin3")
+    # repo.get_alignment_repo()
+    # repo.convert_alignment_repo_to_json()
+    # repo.get_related_pechas()
+    repo = AlignmentRepo(
+        "AB3CAED2A", "OpenPecha-Data", "tenzin3", ROOT_DIR / "AB3CAED2A"
     )
-    print(pecha_repo.pecha_repo_fn)
-    pecha_repo.convert_pecha_repo_to_stam()
+    repo.load_pecha_repos()
+    for pecha_id, pecha_repo in repo.pecha_repos.items():
+        pecha_repo = PechaRepo(
+            pecha_id, "OpenPecha-Data", "tenzin3", ROOT_DIR / pecha_id
+        )
+        pecha_repo.convert_pecha_repo_to_stam()
