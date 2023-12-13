@@ -53,7 +53,7 @@ class Alignment:
 
     @property
     def alignment_fn(self):
-        return str(self.base_path / f"{self.id_}.opa" / "9103.json")
+        return str(self.base_path / f"{self.id_}.opa" / "alignment.json")
 
     def load_alignment(self):
         with open(self.alignment_fn, encoding="utf-8") as file:
@@ -63,7 +63,7 @@ class Alignment:
 
         # load pechas
         for id_ in self.segment_source.keys():
-            self.pechas[id_] = Pecha(id_, ROOT_DIR / id_)
+            self.pechas[id_] = Pecha.from_id(id_)
 
     def get_segment_pairs(self):
         for id_ in self.segment_pairs:
@@ -114,6 +114,7 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 
 if __name__ == "__main__":
-    alignment = Alignment("AB3CAED2A", ROOT_DIR / "AB3CAED2A")
-    for segment_pair in alignment.get_segment_pairs():
+    alignment = Alignment.from_id("AB3CAED2A")
+    segment_pairs = alignment.get_segment_pairs()
+    for segment_pair in segment_pairs:
         print(segment_pair)

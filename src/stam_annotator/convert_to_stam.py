@@ -171,7 +171,11 @@ class AlignmentRepo:
                     continue
                 if doc.endswith(".yml"):
                     yml_file_path = parent_dir / doc
-                    json_file_path = new_parent_dir / doc.replace(".yml", ".json")
+                    new_file_name = doc.replace(".yml", ".json")
+                    """normalize the name of alignment file"""
+                    if doc != "meta.yml":
+                        new_file_name = "alignment.json"
+                    json_file_path = new_parent_dir / new_file_name
                     convert_yml_file_to_json(yml_file_path, json_file_path)
                     continue
 
@@ -276,14 +280,10 @@ class CustomEncoder(JSONEncoder):
 
 if __name__ == "__main__":
 
-    # repo = AlignmentRepo.from_id("AB3CAED2A")
-    # repo.get_alignment_repo()
-    # repo.convert_alignment_repo_to_json()
-    # repo.get_aligned_pechas()
-    # for pecha_id, pecha_repo in repo.pecha_repos.items():
-    #     pecha_repo = PechaRepo(pecha_id, ROOT_DIR / pecha_id)
-    #     pecha_repo.convert_pecha_repo_to_stam()
-    repo = AlignmentRepo("AB3CAED2A", ROOT_DIR / "AB3CAED2A")
-    # repo.upload_alignment_repo()
-    repo.load_pecha_repos()
-    repo.upload_aligned_pechas()
+    repo = AlignmentRepo.from_id("AB3CAED2A")
+    repo.get_alignment_repo()
+    repo.convert_alignment_repo_to_json()
+    repo.get_aligned_pechas()
+    for pecha_id, pecha_repo in repo.pecha_repos.items():
+        pecha_repo = PechaRepo(pecha_id, ROOT_DIR / pecha_id)
+        pecha_repo.convert_pecha_repo_to_stam()
