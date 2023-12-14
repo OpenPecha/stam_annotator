@@ -36,7 +36,7 @@ def convert_none_to_null_in_annotations(data):
     if "annotations" in data and isinstance(data["annotations"], dict):
         for key, value in data["annotations"].items():
             data["annotations"][key] = {
-                k: "null" if v is None else v for k, v in value.items()
+                k: "null" if v in [None, {}] else v for k, v in value.items()
             }
     return data
 
