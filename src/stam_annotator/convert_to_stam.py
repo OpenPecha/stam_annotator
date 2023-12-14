@@ -65,17 +65,18 @@ class PechaRepo:
             """loop through a files and folder in same dir."""
             for doc, tag in documents:
                 if tag == "folder":
-                    make_local_folder(new_parent_dir / doc)
                     continue
-                if doc in ["meta.yml", "index.yml"]:
-                    json_file_path = parent_dir / doc
-                    yml_file_path = new_parent_dir / doc.replace(".yml", ".json")
-                    convert_yml_file_to_json(json_file_path, yml_file_path)
-                    continue
+                create_folder_if_not_exists(new_parent_dir)
                 if not doc.endswith(".yml"):
                     shutil.copy(parent_dir / doc, new_parent_dir / doc)
                     continue
-                """convert yml files to stam"""
+                if doc.endswith(".yml") and parent_dir.parent.name != "layers":
+                    yml_file_path = parent_dir / doc
+                    json_output_path = new_parent_dir / doc.replace(".yml", ".json")
+                    convert_yml_file_to_json(yml_file_path, json_output_path)
+                    continue
+
+                """convert yml files in layers to stam"""
                 if parent_dir.parent.name == "layers":
                     base_file_path = next(
                         self.pecha_repo_fn.rglob(f"{parent_dir.name}.txt")
@@ -87,19 +88,16 @@ class PechaRepo:
                     )
                     stams_in_dir.append(curr_stam)
                     continue
-            if len(stams_in_dir) == 1:
-                curr_stam = stams_in_dir[0]
-                save_annotation_store(
-                    curr_stam, new_parent_dir / f"{parent_dir.name}.opf.json"
-                )
 
+            stams_count = len(stams_in_dir)
+            if stams_count == 0:
                 continue
-            if len(stams_in_dir) > 1:
-                curr_stam = combine_stams(stams_in_dir)
-                save_annotation_store(
-                    curr_stam, new_parent_dir / f"{parent_dir.name}opf.json"
-                )
-                continue
+            curr_stam = (
+                stams_in_dir[0] if stams_count == 1 else combine_stams(stams_in_dir)
+            )
+            save_annotation_store(
+                curr_stam, new_parent_dir / f"{parent_dir.name}.opf.json"
+            )
 
     def upload_pecha_repo(self):
         org_name, repo_name = DESTINATION_ORG, self.pecha_id
@@ -203,6 +201,18 @@ class AlignmentRepo:
             pecha_repo.upload_pecha_repo()
 
 
+def create_folder_if_not_exists(folder_path):
+    """
+    Create a folder at the given path if it does not exist.
+    This also creates any necessary parent folders.
+
+    :param folder_path: Path of the folder to be created.
+    """
+    path = Path(folder_path)
+    if not path.exists():
+        path.mkdir(parents=True, exist_ok=True)
+
+
 def create_github_repo(org_name: str, repo_name: str, token: str) -> bool:
     try:
         g = Github(token)
@@ -259,16 +269,24 @@ def get_folder_structure(path: Path):
 def replace_parent_folder_name(path: Path, old_name: str, new_name: str):
     """Replace the parent folder name of the path with the new name"""
 
-    new_path = str(path).replace(old_name, new_name)
-    return Path(new_path)
+    parts = path.parts
+    layers_dir = "layers"
+    """if there are folders presented in layers dir, then the path is trimmed"""
+    if layers_dir in parts:
+        index = parts.index(layers_dir)
+        trimmed_path = Path(*parts[: index + 1])
+    else:
+        trimmed_path = path
+
+    return Path(str(trimmed_path).replace(old_name, new_name))
 
 
-def convert_yml_file_to_json(yml_file_path: Path, json_file_path: Path):
+def convert_yml_file_to_json(yml_file_path: Path, json_output_path: Path):
     yml_content = yml_file_path.read_text(encoding="utf-8")
     converted_json = json.dumps(
         yaml.safe_load(yml_content), indent=4, cls=CustomEncoder
     )
-    json_file_path.write_text(converted_json)
+    json_output_path.write_text(converted_json)
 
 
 class CustomEncoder(JSONEncoder):
@@ -282,10 +300,6 @@ class CustomEncoder(JSONEncoder):
 
 if __name__ == "__main__":
 
-    repo = AlignmentRepo.from_id("AB3CAED2A")
-    repo.get_alignment_repo()
-    repo.convert_alignment_repo_to_json()
-    repo.get_aligned_pechas()
-    for pecha_id, pecha_repo in repo.pecha_repos.items():
-        pecha_repo = PechaRepo(pecha_id, ROOT_DIR / pecha_id)
-        pecha_repo.convert_pecha_repo_to_stam()
+    pecha_repo = PechaRepo.from_id("I1A92E2D9")
+    pecha_repo.get_pecha_repo()
+    pecha_repo.convert_pecha_repo_to_stam()
