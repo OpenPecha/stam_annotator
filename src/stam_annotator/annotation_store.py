@@ -3,15 +3,15 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator
 
-from stam_annotator.config import KeyEnum, ValueEnum
+from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
 from stam_annotator.opf_loader import OpfAnnotation, Span
 from stam_annotator.utility import get_filename_without_extension, get_uuid
 
 
 class Annotation_Data(BaseModel):
     annotation_data_id: str
-    annotation_data_key: KeyEnum
-    annotation_data_value: ValueEnum
+    annotation_data_key: AnnotationGroupEnum
+    annotation_data_value: AnnotationEnum
 
     store_id: str
 
@@ -31,7 +31,7 @@ class Annotation(BaseModel):
 
 class Annotation_Data_Set(BaseModel):
     data_set_id: str
-    data_set_key: KeyEnum
+    data_set_key: AnnotationGroupEnum
     annotation_datas: List[Annotation_Data] = Field(default_factory=list)
 
     @field_validator("data_set_id", mode="before")
@@ -81,7 +81,7 @@ def create_resource(file_path: Union[str, Path]):
     return Resource(resource_id=resource_id, text=text)
 
 
-def create_data_set(data_set_id: str, data_set_key: KeyEnum):
+def create_data_set(data_set_id: str, data_set_key: AnnotationGroupEnum):
     return Annotation_Data_Set(data_set_id=data_set_id, data_set_key=data_set_key)
 
 
@@ -110,7 +110,7 @@ def add_annotation_data_to_data_set(
 
 def convert_opf_for_pre_stam_format(
     opf_annot: OpfAnnotation,
-    annotation_type_key: KeyEnum,
+    annotation_type_key: AnnotationGroupEnum,
     resource_file_path: Union[str, Path],
 ) -> Annotation_Store:
     """

@@ -9,7 +9,7 @@ from typing import Dict, List
 import yaml
 from github import Github
 
-from stam_annotator.config import ROOT_DIR, KeyEnum
+from stam_annotator.config import ROOT_DIR, AnnotationGroupEnum
 from stam_annotator.github_token import GITHUB_TOKEN
 from stam_annotator.opf_to_stam import opf_to_stam_pipeline
 from stam_annotator.stam_manager import combine_stams
@@ -81,7 +81,9 @@ class PechaRepo:
                         self.pecha_repo_fn.rglob(f"{parent_dir.name}.txt")
                     )
                     curr_stam = opf_to_stam_pipeline(
-                        parent_dir / doc, base_file_path, KeyEnum.structure_type
+                        parent_dir / doc,
+                        base_file_path,
+                        AnnotationGroupEnum.structure_type,
                     )
                     stams_in_dir.append(curr_stam)
                     continue

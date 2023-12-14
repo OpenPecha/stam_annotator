@@ -5,7 +5,7 @@ from typing import List, Sequence, Union
 import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
-from stam_annotator.config import KeyEnum, ValueEnum
+from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
 from stam_annotator.opa_loader import OpaAnnotation
 from stam_annotator.utility import convert_opf_stam_annotation_to_dictionary
 
@@ -31,7 +31,10 @@ def get_annotation_data_set(store: AnnotationStore, key: str) -> AnnotationDataS
 
 
 def get_annotations(
-    store: AnnotationStore, key: KeyEnum, value: ValueEnum, include_payload: bool = True
+    store: AnnotationStore,
+    key: AnnotationGroupEnum,
+    value: AnnotationEnum,
+    include_payload: bool = True,
 ) -> Annotations:
     start_time = time.time()
 

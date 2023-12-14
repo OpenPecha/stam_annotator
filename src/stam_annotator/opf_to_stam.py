@@ -8,7 +8,7 @@ from stam_annotator.annotation_store import (
     Annotation_Store,
     convert_opf_for_pre_stam_format,
 )
-from stam_annotator.config import KeyEnum
+from stam_annotator.config import AnnotationGroupEnum
 from stam_annotator.opf_loader import create_opf_annotation_instance
 from stam_annotator.utility import load_opf_annotations_from_yaml
 
@@ -25,7 +25,7 @@ def create_resource(store: AnnotationStore, resource_id: str, text: str):
     return store.add_resource(id=resource_id, text=text)
 
 
-def create_dataset(store: AnnotationStore, id: str, key: KeyEnum):
+def create_dataset(store: AnnotationStore, id: str, key: AnnotationGroupEnum):
     dataset = store.add_dataset(id=id)
     dataset.add_key(key.value)
     return dataset
@@ -86,7 +86,9 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
 
 
 def opf_to_stam_pipeline(
-    opf_yml_file_path: Path, resource_file_path: Path, annotation_type_key: KeyEnum
+    opf_yml_file_path: Path,
+    resource_file_path: Path,
+    annotation_type_key: AnnotationGroupEnum,
 ):
     opf_data_dict = load_opf_annotations_from_yaml(opf_yml_file_path)
     opf_obj = create_opf_annotation_instance(opf_data_dict)
