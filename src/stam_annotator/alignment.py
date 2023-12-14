@@ -32,9 +32,15 @@ class Pecha:
     def from_id(cls, id_: str):
         """load if annotations exits"""
         if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
-            cls.base_path = clone_repo(
-                ORGANIZATION, id_, GITHUB_TOKEN, destination_folder=ROOT_DIR / f"{id_}"
-            )
+            if not (ROOT_DIR / f"{id_}").exists():
+                cls.base_path = clone_repo(
+                    ORGANIZATION,
+                    id_,
+                    GITHUB_TOKEN,
+                    destination_folder=ROOT_DIR / f"{id_}",
+                )
+            else:
+                cls.base_path = ROOT_DIR / f"{id_}"
             return cls(id_, cls.base_path)
 
     def get_annotation(self, id_: str, pecha_stam_name) -> str:
@@ -114,7 +120,7 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 
 if __name__ == "__main__":
-    alignment = Alignment.from_id("AB3CAED2A")
+    alignment = Alignment("AB3CAED2A", ROOT_DIR / "AB3CAED2A")
     segment_pairs = alignment.get_segment_pairs()
     for segment_pair in segment_pairs:
         print(segment_pair)
