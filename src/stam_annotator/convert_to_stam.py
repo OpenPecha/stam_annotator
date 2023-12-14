@@ -9,7 +9,7 @@ from typing import Dict, List
 import yaml
 from github import Github
 
-from stam_annotator.definations import ROOT_DIR, KeyEnum
+from stam_annotator.config import ROOT_DIR, KeyEnum
 from stam_annotator.github_token import GITHUB_TOKEN
 from stam_annotator.opf_to_stam import opf_to_stam_pipeline
 from stam_annotator.stam_manager import combine_stams

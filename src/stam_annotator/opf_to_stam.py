@@ -8,9 +8,9 @@ from stam_annotator.annotation_store import (
     Annotation_Store,
     convert_opf_for_pre_stam_format,
 )
-from stam_annotator.definations import OPF_EN_DIR, KeyEnum
+from stam_annotator.config import KeyEnum
 from stam_annotator.opf_loader import create_opf_annotation_instance
-from stam_annotator.utility import load_opf_annotations_from_yaml, save_annotation_store
+from stam_annotator.utility import load_opf_annotations_from_yaml
 
 
 def get_uuid():
@@ -99,15 +99,4 @@ def opf_to_stam_pipeline(
 
 
 if __name__ == "__main__":
-    # Define your file paths and other parameters
-
-    resource_file_path = OPF_EN_DIR / "9342.txt"
-    opf_yaml_file_path = OPF_EN_DIR / "Segment.yml"
-
-    annotation_type_key = KeyEnum.structure_type
-    opf_stam = opf_to_stam_pipeline(
-        opf_yaml_file_path, resource_file_path, annotation_type_key
-    )
-
-    output_file_path = OPF_EN_DIR / "Segment.json"
-    save_annotation_store(opf_stam, output_file_path)
+    pass

@@ -3,12 +3,7 @@ from typing import Dict
 
 from pydantic import BaseModel, field_validator
 
-from stam_annotator.definations import OPA_DIR
-from stam_annotator.utility import (
-    load_opa_annotations_from_yaml,
-    read_json_to_dict,
-    save_json_file,
-)
+from stam_annotator.utility import load_opa_annotations_from_yaml, read_json_to_dict
 
 
 class SegmentSource(BaseModel):
@@ -56,8 +51,4 @@ def create_opa_annotation_from_json(json_path: Path) -> OpaAnnotation:
 
 
 if __name__ == "__main__":
-    file_path = OPA_DIR / "36CA.yml"
-    data = load_opa_annotations_from_yaml(file_path)
-    opa_annotation = create_opa_annotation_instance(file_path)
-    opa_json = opa_annotation.model_dump()
-    save_json_file(opa_json, OPA_DIR / "36CA.json")
+    pass

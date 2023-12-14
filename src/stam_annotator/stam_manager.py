@@ -5,14 +5,8 @@ from typing import List, Sequence, Union
 import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
-from stam_annotator.definations import (
-    OPA_DIR,
-    OPF_BO_DIR,
-    OPF_EN_DIR,
-    KeyEnum,
-    ValueEnum,
-)
-from stam_annotator.opa_loader import OpaAnnotation, create_opa_annotation_from_json
+from stam_annotator.config import KeyEnum, ValueEnum
+from stam_annotator.opa_loader import OpaAnnotation
 from stam_annotator.utility import convert_opf_stam_annotation_to_dictionary
 
 
@@ -158,8 +152,4 @@ def get_alignment_annotations(
 
 
 if __name__ == "__main__":
-    opa_annot = create_opa_annotation_from_json(OPA_DIR / "36CA.json")
-    bo_opf = load_stam_from_json(OPF_BO_DIR / "Segment.json")
-    en_opf = load_stam_from_json(OPF_EN_DIR / "Segment.json")
-
-    alignment_annot = get_alignment_annotations(opa_annot, [bo_opf, en_opf])
+    pass

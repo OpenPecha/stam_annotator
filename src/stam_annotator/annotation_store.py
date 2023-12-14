@@ -3,17 +3,9 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator
 
-from stam_annotator.definations import OPF_DIR, KeyEnum, ValueEnum
-from stam_annotator.opf_loader import (
-    OpfAnnotation,
-    Span,
-    create_opf_annotation_instance,
-)
-from stam_annotator.utility import (
-    get_filename_without_extension,
-    get_uuid,
-    load_opf_annotations_from_yaml,
-)
+from stam_annotator.config import KeyEnum, ValueEnum
+from stam_annotator.opf_loader import OpfAnnotation, Span
+from stam_annotator.utility import get_filename_without_extension, get_uuid
 
 
 class Annotation_Data(BaseModel):
@@ -157,13 +149,4 @@ def convert_opf_for_pre_stam_format(
 
 
 if __name__ == "__main__":
-    segment_yaml_path = OPF_DIR / "Correction.yml"
-    resource_file_path = OPF_DIR / "v001.txt"
-    opf_data_dict = load_opf_annotations_from_yaml(segment_yaml_path)
-
-    opf_obj = create_opf_annotation_instance(opf_data_dict)
-    data_set_key = KeyEnum.structure_type
-    stam_model = convert_opf_for_pre_stam_format(
-        opf_obj, data_set_key, resource_file_path
-    )
-    print(stam_model)
+    pass

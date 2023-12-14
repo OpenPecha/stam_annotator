@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+github_token.py
 
 # C extensions
 *.so

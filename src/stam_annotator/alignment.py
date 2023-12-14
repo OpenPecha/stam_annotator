@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 from github import Github
 from stam import AnnotationStore
 
-from stam_annotator.definations import ROOT_DIR
+from stam_annotator.config import ROOT_DIR
 from stam_annotator.github_token import GITHUB_TOKEN
 
 ORGANIZATION = "PechaData"
