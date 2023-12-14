@@ -1,8 +1,17 @@
 from enum import Enum
 from pathlib import Path
 
-CUR_DIR = Path(__file__).parent.absolute()
-ROOT_DIR = CUR_DIR.parent.parent.absolute()
+
+def _mkdir(path):
+    if path.is_dir():
+        return path
+    path.mkdir(exist_ok=True, parents=True)
+    return path
+
+
+# Path
+BASE_PATH = _mkdir(Path.home() / ".openpecha")
+PECHAS_PATH = _mkdir(BASE_PATH / "pechas")
 
 
 class AnnotationEnum(Enum):

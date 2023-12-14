@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 from github import Github
 from stam import AnnotationStore
 
-from stam_annotator.config import ROOT_DIR
+from stam_annotator.config import PECHAS_PATH
 from stam_annotator.github_token import GITHUB_TOKEN
 
 ORGANIZATION = "PechaData"
@@ -29,18 +29,18 @@ class Pecha:
             self.stams[json_file.parent.name] = AnnotationStore(file=str(json_file))
 
     @classmethod
-    def from_id(cls, id_: str):
-        """load if annotations exits"""
+    def from_id(cls, id_: str, out_path: Path = PECHAS_PATH):
+        """Check if repo exists in github"""
         if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
-            if not (ROOT_DIR / f"{id_}").exists():
-                cls.base_path = clone_repo(
+            """clone repo if not exists in local"""
+            if not (out_path / f"{id_}").exists():
+                clone_repo(
                     ORGANIZATION,
                     id_,
                     GITHUB_TOKEN,
-                    destination_folder=ROOT_DIR / f"{id_}",
+                    destination_folder=out_path / f"{id_}",
                 )
-            else:
-                cls.base_path = ROOT_DIR / f"{id_}"
+            cls.base_path = out_path / f"{id_}"
             return cls(id_, cls.base_path)
 
     def get_annotation(self, id_: str, pecha_stam_name) -> str:
@@ -87,12 +87,17 @@ class Alignment:
         return segment_pair
 
     @classmethod
-    def from_id(cls, id_: str):
+    def from_id(cls, id_: str, out_path: Path = PECHAS_PATH):
         """load if alignment exits"""
         if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
-            cls.base_path = clone_repo(
-                ORGANIZATION, id_, GITHUB_TOKEN, destination_folder=ROOT_DIR / f"{id_}"
-            )
+            if not (out_path / f"{id_}").exists():
+                clone_repo(
+                    ORGANIZATION,
+                    id_,
+                    GITHUB_TOKEN,
+                    destination_folder=out_path / f"{id_}",
+                )
+            cls.base_path = out_path / f"{id_}"
             return cls(id_, cls.base_path)
 
 
@@ -113,14 +118,13 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
         repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
         subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
         print(f"Repository {repo_name} cloned successfully into {destination_folder}")
-        return destination_folder
 
     except subprocess.CalledProcessError as e:
         print(f"Error cloning {repo_name} repository: {e}")
 
 
 if __name__ == "__main__":
-    alignment = Alignment("AB3CAED2A", ROOT_DIR / "AB3CAED2A")
+    alignment = Alignment.from_id("AB3CAED2A")
     segment_pairs = alignment.get_segment_pairs()
     for segment_pair in segment_pairs:
         print(segment_pair)
