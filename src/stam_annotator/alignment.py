@@ -48,7 +48,10 @@ class Pecha:
         return cls(id_, cls.base_path)
 
     def get_annotation(self, id_: str, pecha_stam_name) -> str:
-        return self.stams[pecha_stam_name].annotation(id_).text()
+        """stam returns annotation texts in a list, so we join them"""
+        annotation_text_list = self.stams[pecha_stam_name].annotation(id_).text()
+        annotation_text = " ".join(annotation_text_list)
+        return annotation_text
 
 
 class Alignment:
@@ -131,4 +134,6 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 
 if __name__ == "__main__":
-    alignment = Alignment.from_id("AB3CAED2")
+    alignment = Alignment.from_id("AB3CAED2A")
+    for segment_pair in alignment.get_segment_pairs():
+        print(segment_pair)
