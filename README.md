@@ -7,18 +7,22 @@
 
 <!-- Replace with 1-sentence description about what this tool is or does.-->
 
-<h3 align="center">Use this repo template for all new Python projects.</h3>
+<h3 align="center">STAM ANNOTATOR</h3>
 
 ## Description
 
-Project description goes here.
+A python package meant for working with annotations from alignment(OPA) and pecha(OPF) repos in "PechaData".
+PechaData is github page which contains same data as OpenPecha-Data but in a different format name STAM.
+
+Stand-off Text Annotation Model (STAM) is a data model for stand-off-text annotation where any information on a text is represented as an annotation.
+
 
 ## Project owner(s)
 
 <!-- Link to the repo owners' github profiles -->
 
 - [@10zinten](https://github.com/10zinten)
-- [@evanyerburgh](https://github.com/evanyerburgh)
+- [@tenzin3](https://github.com/tenzin3)
 
 ## Integrations
 
