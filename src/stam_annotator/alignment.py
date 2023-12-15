@@ -31,17 +31,17 @@ class Pecha:
     @classmethod
     def from_id(cls, id_: str, out_path: Path = PECHAS_PATH):
         """Check if repo exists in github"""
-        if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
-            """clone repo if not exists in local"""
-            if not (out_path / f"{id_}").exists():
+        if not (out_path / f"{id_}").exists():
+            if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
+
                 clone_repo(
                     ORGANIZATION,
                     id_,
                     GITHUB_TOKEN,
                     destination_folder=out_path / f"{id_}",
                 )
-            cls.base_path = out_path / f"{id_}"
-            return cls(id_, cls.base_path)
+        cls.base_path = out_path / f"{id_}"
+        return cls(id_, cls.base_path)
 
     def get_annotation(self, id_: str, pecha_stam_name) -> str:
         return self.stams[pecha_stam_name].annotation(id_).text()
@@ -89,16 +89,16 @@ class Alignment:
     @classmethod
     def from_id(cls, id_: str, out_path: Path = PECHAS_PATH):
         """load if alignment exits"""
-        if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
-            if not (out_path / f"{id_}").exists():
+        if not (out_path / f"{id_}").exists():
+            if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
                 clone_repo(
                     ORGANIZATION,
                     id_,
                     GITHUB_TOKEN,
                     destination_folder=out_path / f"{id_}",
                 )
-            cls.base_path = out_path / f"{id_}"
-            return cls(id_, cls.base_path)
+        cls.base_path = out_path / f"{id_}"
+        return cls(id_, cls.base_path)
 
 
 def check_repo_exists(token, org_name, repo_name):
