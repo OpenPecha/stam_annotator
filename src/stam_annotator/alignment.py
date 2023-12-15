@@ -7,7 +7,7 @@ from github import Github, GithubException
 from stam import AnnotationStore
 
 from stam_annotator.config import PECHAS_PATH
-from stam_annotator.exceptions import RepoDoesNotExist
+from stam_annotator.exceptions import RepoCloneError, RepoDoesNotExist
 from stam_annotator.github_token import GITHUB_TOKEN
 
 ORGANIZATION = "PechaData"
@@ -44,6 +44,10 @@ class Pecha:
             except RepoDoesNotExist as error:
                 print(f"Pecha {error.message}")
                 return None
+            except RepoCloneError as error:
+                print(f"Pecha {error.message}")
+                return None
+
         cls.base_path = out_path / f"{id_}"
         return cls(id_, cls.base_path)
 
@@ -108,6 +112,9 @@ class Alignment:
             except RepoDoesNotExist as error:
                 print(f"Alignment {error.message}")
                 return None
+            except RepoCloneError as error:
+                print(f"Alignment {error.message}")
+                return None
 
         cls.base_path = out_path / f"{id_}"
         return cls(id_, cls.base_path)
@@ -130,7 +137,7 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
         print(f"Repository {repo_name} cloned successfully into {destination_folder}")
 
     except subprocess.CalledProcessError as e:
-        print(f"Error cloning {repo_name} repository: {e}")
+        raise RepoCloneError(org, repo_name, e)
 
 
 if __name__ == "__main__":
