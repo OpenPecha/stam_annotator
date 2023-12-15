@@ -3,10 +3,11 @@ import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-from github import Github
+from github import Github, GithubException
 from stam import AnnotationStore
 
 from stam_annotator.config import PECHAS_PATH
+from stam_annotator.exceptions import RepoDoesNotExist
 from stam_annotator.github_token import GITHUB_TOKEN
 
 ORGANIZATION = "PechaData"
@@ -32,14 +33,17 @@ class Pecha:
     def from_id(cls, id_: str, out_path: Path = PECHAS_PATH):
         """Check if repo exists in github"""
         if not (out_path / f"{id_}").exists():
-            if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
-
+            try:
+                check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_)
                 clone_repo(
                     ORGANIZATION,
                     id_,
                     GITHUB_TOKEN,
                     destination_folder=out_path / f"{id_}",
                 )
+            except RepoDoesNotExist as error:
+                print(f"Pecha {error.message}")
+                return None
         cls.base_path = out_path / f"{id_}"
         return cls(id_, cls.base_path)
 
@@ -90,13 +94,18 @@ class Alignment:
     def from_id(cls, id_: str, out_path: Path = PECHAS_PATH):
         """load if alignment exits"""
         if not (out_path / f"{id_}").exists():
-            if check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_):
+            try:
+                check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_)
                 clone_repo(
                     ORGANIZATION,
                     id_,
                     GITHUB_TOKEN,
                     destination_folder=out_path / f"{id_}",
                 )
+            except RepoDoesNotExist as error:
+                print(f"Alignment {error.message}")
+                return None
+
         cls.base_path = out_path / f"{id_}"
         return cls(id_, cls.base_path)
 
@@ -106,10 +115,8 @@ def check_repo_exists(token, org_name, repo_name):
     try:
         org = g.get_organization(org_name)
         org.get_repo(repo_name)
-        return True
-    except Exception as e:
-        print(f"Error with repo {repo_name}: {e}")
-        return False
+    except GithubException:
+        raise RepoDoesNotExist(org_name, repo_name)
 
 
 def clone_repo(org, repo_name, token, destination_folder: Path):
@@ -124,7 +131,4 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 
 if __name__ == "__main__":
-    alignment = Alignment.from_id("AB3CAED2A")
-    segment_pairs = alignment.get_segment_pairs()
-    for segment_pair in segment_pairs:
-        print(segment_pair)
+    alignment = Alignment.from_id("AB3CAED2")
