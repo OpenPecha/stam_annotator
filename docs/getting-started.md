@@ -16,6 +16,23 @@ step 2.
 
 ## 2. Installation
 
+2.1 create a virtual environment.
+
+        python3 - venv .venv
+
+2.2 activate the virtual environment.
+
+2.2.1 For linux and mac
+
+        source .venv/bin/activate
+
+2.2.2 For windows
+
+        .\venv\Scripts\activate
+
+
+2.3  install the package
+
         pip install git+https://github.com/OpenPecha/stam_annotator.git
 
 
