@@ -54,6 +54,7 @@ in beginning your work with the project.
         for text, language in segment_pair:
             print(f"{language}: {text}")
 
+
 With slight modification to the first example, this code snippet would output the following
 
     sa: atha vā sarvabhāvānāṃ śūnyatvāc chāśvatādayaḥ | kva kasya katamāḥ kasmāt saṃbhaviṣyanti dṛṣṭayaḥ || 29 ||

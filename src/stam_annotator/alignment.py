@@ -8,7 +8,6 @@ from stam import AnnotationStore
 
 from stam_annotator.config import PECHAS_PATH
 from stam_annotator.exceptions import RepoCloneError, RepoDoesNotExist
-from stam_annotator.github_token import GITHUB_TOKEN
 
 ORGANIZATION = "PechaData"
 
@@ -25,9 +24,11 @@ class Pecha:
         return self.base_path / f"{self.id_}.opf" / "layers"
 
     def load_stams(self):
-        json_files = list(self.pecha_fn.glob("**/*.json"))
+        json_files = list(self.pecha_fn.glob("**/*.opf.json"))
         for json_file in json_files:
-            self.stams[json_file.parent.name] = AnnotationStore(file=str(json_file))
+            index = json_file.name.index(".opf.json")
+            stam_name = json_file.name[:index]
+            self.stams[stam_name] = AnnotationStore(file=str(json_file))
 
     @classmethod
     def from_id(cls, id_: str, github_token: str, out_path: Path = PECHAS_PATH):
@@ -142,4 +143,7 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 
 if __name__ == "__main__":
-    alignment = Pecha.from_id("I5E597420", GITHUB_TOKEN)
+    github_token = "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"
+    alignment = Alignment.from_id("AB3CAED2A", github_token)
+    for segment_pair in alignment.get_segment_pairs():
+        print(segment_pair)

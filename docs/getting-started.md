@@ -23,7 +23,7 @@ need to install them manually.
 
 2.1 Create a virtual environment.
 
-        python3 - venv .venv
+        python3 -m venv .venv
 
 2.2 Activate the virtual environment.
 

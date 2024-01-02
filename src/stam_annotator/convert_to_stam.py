@@ -197,6 +197,7 @@ class AlignmentRepo:
         self.load_pecha_repos()
         for _, pecha in self.pecha_repos.items():
             pecha.get_pecha_repo()
+            pecha.convert_pecha_repo_to_stam()
 
     def upload_aligned_pechas(self):
         for _, pecha_repo in self.pecha_repos.items():
@@ -301,7 +302,9 @@ class CustomEncoder(JSONEncoder):
 
 
 if __name__ == "__main__":
-
-    pecha_repo = PechaRepo.from_id("P000218")
-    # pecha_repo.get_pecha_repo()
-    pecha_repo.convert_pecha_repo_to_stam()
+    alignment_repo = AlignmentRepo.from_id("AB3CAED2A")
+    alignment_repo.get_alignment_repo()
+    alignment_repo.convert_alignment_repo_to_json()
+    alignment_repo.get_aligned_pechas()
+    alignment_repo.upload_alignment_repo()
+    alignment_repo.upload_aligned_pechas()
