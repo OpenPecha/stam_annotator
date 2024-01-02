@@ -33,4 +33,4 @@ None
 
 <!-- Update the link to the docs -->
 
-Read the docs [here](https://wiki.openpecha.org/#/dev/coding-guidelines).
+Read the docs [here](docs/getting-started.md).

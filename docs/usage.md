@@ -8,7 +8,7 @@ in beginning your work with the project.
 
         from stam_annotator.alignment import Alignment
 
-        alignment = Alignment.from_id("AB3CAED2A")
+        alignment = Alignment.from_id("AB3CAED2A", github_token)
         for segment_pair in alignment.get_segment_pairs():
             print(segment_pair)
 
@@ -16,7 +16,7 @@ in beginning your work with the project.
 
 - This code snippet demonstrates how to import the necessary Alignment class and
     create an alignment (OPA) object.
-- The from_id method is used here. It requires an alignment ID as a parameter and
+- The from_id method is used here. It requires an alignment ID and github token
     creates an object based on that ID.
 - The created object features a get_segment_pairs method, which provides a list
     of segment pairs. Each pair in the list is a tuple comprising two elements:
@@ -31,7 +31,7 @@ in beginning your work with the project.
         from stam_annotator.alignment import Alignment
 
         alignment_path = Path("path/to/alignment")
-        alignment = Alignment("AB3CAED2A", alignment_path)
+        alignment = Alignment("AB3CAED2A", github_token, alignment_path)
         for segment_pair in alignment.get_segment_pairs():
             print(segment_pair)
 
@@ -44,10 +44,12 @@ in beginning your work with the project.
     as tuples of text strings and language identifiers.
 - Note that the alignment OPA and pecha OPFs should already be present in the custom path
     provided when using this method.
+- Here the github token is taken so that if any of the pecha OPFs are missing in the
+  custom path, then it will download from the github "PechaData".
 
 
 
-    alignment = Alignment.from_id("AB3CAED2A")
+    alignment = Alignment.from_id("AB3CAED2A", github_token)
     for segment_pair in alignment.get_segment_pairs():
         for text, language in segment_pair:
             print(f"{language}: {text}")
