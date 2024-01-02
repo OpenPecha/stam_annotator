@@ -91,6 +91,9 @@ def opf_to_stam_pipeline(
     annotation_type_key: AnnotationGroupEnum,
 ):
     opf_data_dict = load_opf_annotations_from_yaml(opf_yml_file_path)
+    """if there are no annotations in the opf file, return None"""
+    if not opf_data_dict["annotations"]:
+        return None
     opf_obj = create_opf_annotation_instance(opf_data_dict)
 
     opf_annotation_store = convert_opf_for_pre_stam_format(
