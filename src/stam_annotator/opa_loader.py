@@ -48,7 +48,3 @@ def create_opa_annotation_from_json(json_path: Path) -> OpaAnnotation:
     """
     data = read_json_to_dict(json_path)
     return OpaAnnotation(**data)
-
-
-if __name__ == "__main__":
-    pass

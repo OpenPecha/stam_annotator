@@ -24,10 +24,13 @@ def load_multiple_stam_from_json(
 def get_annotation_data_set(store: AnnotationStore, key: str) -> AnnotationDataSet:
     for data_set in store.datasets():
         for data_set_key in data_set.keys():
-            if data_set_key == data_set.key(key):
-                return data_set
+            try:
+                if data_set_key == data_set.key(key):
+                    return data_set
+            except:  # noqa
+                pass
 
-    return None
+    return False
 
 
 def get_annotations(
@@ -76,18 +79,6 @@ def combine_two_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> Annotati
     for resource in stam2.resources():
         stam1.add_resource(id=resource.id(), text=resource.text())
 
-    # transfer datasets
-    for dataset in stam2.datasets():
-        key = next(dataset.keys(), None)
-        if not key:
-            continue
-        # if the data set already exists
-        if get_annotation_data_set(stam1, key.id()):
-            continue
-
-        new_dataset = stam1.add_dataset(id=dataset.id())
-        new_dataset.add_key(key.id())
-
     # transfer annotations
     for annotation in stam2.annotations():
         annotation_data = next(annotation.__iter__(), None)
@@ -100,11 +91,15 @@ def combine_two_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> Annotati
         else data set id of new is used.
 
         """
-
         annotation_data_key = annotation_data.key().id()
-        data_set = get_annotation_data_set(stam1, annotation_data_key)
-        data_set_id = data_set.id() if data_set else annotation_data.dataset().id()
 
+        data_set = get_annotation_data_set(stam1, annotation_data_key)
+        """if the key is not present in the data set, then it is added to data set"""
+        if not data_set:
+            data_set = next(stam1.datasets())
+            data_set.add_key(annotation_data_key)
+
+        data_set_id = data_set.id()
         data = {
             "id": annotation_data.id(),
             "key": annotation_data_key,
@@ -152,7 +147,3 @@ def get_alignment_annotations(
     print(f"Time taken: {elapsed_time:.2f} seconds")
 
     return alignment_annotations
-
-
-if __name__ == "__main__":
-    pass

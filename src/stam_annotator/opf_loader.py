@@ -1,7 +1,8 @@
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationError, ValidationInfo, field_validator
 
+from stam_annotator.exceptions import CustomDataValidationError
 from stam_annotator.utility import get_uuid
 
 
@@ -32,18 +33,21 @@ class Annotations(BaseModel):
     annotations_dict: Dict[str, Annotation]
 
     def __init__(self, annotations: Dict[str, Dict]):
-        if annotations is None or not annotations:
-            annotations_processed = {}
-        else:
-            annotations_processed = {
-                id: Annotation(
-                    id=id,
-                    span=Span(**value["span"]),
-                    payloads={k: v for k, v in value.items() if k != "span"},
-                )
-                for id, value in annotations.items()
-            }
-        super().__init__(annotations_dict=annotations_processed)
+        try:
+            if annotations is None or not annotations:
+                annotations_processed = {}
+            else:
+                annotations_processed = {
+                    id: Annotation(
+                        id=id,
+                        span=Span(**value["span"]),
+                        payloads={k: v for k, v in value.items() if k != "span"},
+                    )
+                    for id, value in annotations.items()
+                }
+            super().__init__(annotations_dict=annotations_processed)
+        except ValidationError:
+            raise CustomDataValidationError("Span end must not be less than start")
 
     def __getitem__(self, item):
         return self.annotations_dict[item]
@@ -81,14 +85,15 @@ class OpfAnnotation(BaseModel):
 
 
 def create_opf_annotation_instance(data: Dict) -> OpfAnnotation:
-    annotations = Annotations(data["annotations"])
-    return OpfAnnotation(
-        id=data["id"],
-        annotation_type=data["annotation_type"],
-        revision=data["revision"],
-        annotations=annotations,
-    )
-
-
-if __name__ == "__main__":
-    pass
+    try:
+        opf_obj = OpfAnnotation(
+            id=data["id"],
+            annotation_type=data["annotation_type"],
+            revision=data["revision"],
+            annotations=Annotations(data["annotations"]),
+        )
+        return opf_obj
+    except CustomDataValidationError as e:
+        raise CustomDataValidationError(
+            f"file name:{data['annotation_type']}, {e.message}"
+        )

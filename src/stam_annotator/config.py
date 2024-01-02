@@ -12,6 +12,7 @@ def _mkdir(path):
 # Path
 BASE_PATH = _mkdir(Path.home() / ".openpecha")
 PECHAS_PATH = _mkdir(BASE_PATH / "pechas")
+ROOT_DIR = Path(__file__).parent.parent.parent
 
 
 class AnnotationEnum(Enum):
@@ -23,6 +24,7 @@ class AnnotationEnum(Enum):
     poti_title = "PotiTitle"
     author = "Author"
     chapter = "Chapter"
+    quotation = "Quotation"
 
     topic = "Text"
     sub_topic = "SubText"
@@ -37,7 +39,6 @@ class AnnotationEnum(Enum):
     sabche = "Sabche"
     tsawa = "Tsawa"
     yigchung = "Yigchung"
-    archaic = "Archaic"
     durchen = "Durchen"
     footnote = "Footnote"
     segment = "Segment"

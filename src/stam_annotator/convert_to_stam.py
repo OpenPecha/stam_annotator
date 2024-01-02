@@ -82,11 +82,13 @@ class PechaRepo:
                         self.pecha_repo_fn.rglob(f"{parent_dir.name}.txt")
                     )
                     curr_stam = opf_to_stam_pipeline(
+                        self.pecha_id,
                         parent_dir / doc,
                         base_file_path,
                         AnnotationGroupEnum.structure_type,
                     )
-                    stams_in_dir.append(curr_stam)
+                    if curr_stam:
+                        stams_in_dir.append(curr_stam)
                     continue
 
             stams_count = len(stams_in_dir)
@@ -300,6 +302,6 @@ class CustomEncoder(JSONEncoder):
 
 if __name__ == "__main__":
 
-    pecha_repo = PechaRepo.from_id("I1A92E2D9")
-    pecha_repo.get_pecha_repo()
+    pecha_repo = PechaRepo.from_id("P000218")
+    # pecha_repo.get_pecha_repo()
     pecha_repo.convert_pecha_repo_to_stam()

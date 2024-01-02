@@ -146,7 +146,3 @@ def convert_opf_for_pre_stam_format(
         annotation_store.add_annotation(annotation)
 
     return annotation_store
-
-
-if __name__ == "__main__":
-    pass
