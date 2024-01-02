@@ -30,15 +30,15 @@ class Pecha:
             self.stams[json_file.parent.name] = AnnotationStore(file=str(json_file))
 
     @classmethod
-    def from_id(cls, id_: str, out_path: Path = PECHAS_PATH):
+    def from_id(cls, id_: str, github_token: str, out_path: Path = PECHAS_PATH):
         """Check if repo exists in github"""
         if not (out_path / f"{id_}").exists():
             try:
-                check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_)
+                check_repo_exists(github_token, ORGANIZATION, repo_name=id_)
                 clone_repo(
                     ORGANIZATION,
                     id_,
-                    GITHUB_TOKEN,
+                    github_token,
                     destination_folder=out_path / f"{id_}",
                 )
             except RepoDoesNotExist as error:
@@ -62,8 +62,9 @@ class Alignment:
     segment_source: Dict[str, Dict[str, str]]
     segment_pairs: Dict[str, Dict[str, str]]
 
-    def __init__(self, id_: str, base_path: Path):
+    def __init__(self, id_: str, github_token: str, base_path: Path):
         self.id_ = id_
+        self.github_token = github_token
         self.base_path = base_path
         self.pechas: Dict = {}
         self.load_alignment()
@@ -80,7 +81,7 @@ class Alignment:
 
         # load pechas
         for id_ in self.segment_source.keys():
-            self.pechas[id_] = Pecha.from_id(id_)
+            self.pechas[id_] = Pecha.from_id(id_, self.github_token)
 
     def get_segment_pairs(self):
         for id_ in self.segment_pairs:
@@ -98,15 +99,15 @@ class Alignment:
         return segment_pair
 
     @classmethod
-    def from_id(cls, id_: str, out_path: Path = PECHAS_PATH):
+    def from_id(cls, id_: str, github_token: str, out_path: Path = PECHAS_PATH):
         """load if alignment exits"""
         if not (out_path / f"{id_}").exists():
             try:
-                check_repo_exists(GITHUB_TOKEN, ORGANIZATION, repo_name=id_)
+                check_repo_exists(github_token, ORGANIZATION, repo_name=id_)
                 clone_repo(
                     ORGANIZATION,
                     id_,
-                    GITHUB_TOKEN,
+                    github_token,
                     destination_folder=out_path / f"{id_}",
                 )
             except RepoDoesNotExist as error:
@@ -117,7 +118,7 @@ class Alignment:
                 return None
 
         cls.base_path = out_path / f"{id_}"
-        return cls(id_, cls.base_path)
+        return cls(id_, github_token, cls.base_path)
 
 
 def check_repo_exists(token, org_name, repo_name):
@@ -141,6 +142,4 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 
 if __name__ == "__main__":
-    alignment = Alignment.from_id("AB3CAED2A")
-    for segment_pair in alignment.get_segment_pairs():
-        print(segment_pair)
+    alignment = Pecha.from_id("I5E597420", GITHUB_TOKEN)
