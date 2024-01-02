@@ -6,12 +6,13 @@ in beginning your work with the project.
 
 1. ***Instatiating an alignment(OPA) object with just ID.***
 
-        from stam_annotator.alignment import Alignment
+```python
+from stam_annotator.alignment import Alignment
 
-        alignment = Alignment.from_id("AB3CAED2A", github_token)
-        for segment_pair in alignment.get_segment_pairs():
-            print(segment_pair)
-
+alignment = Alignment.from_id("AB3CAED2A", github_token)
+for segment_pair in alignment.get_segment_pairs():
+    print(segment_pair)
+```
 
 
 - This code snippet demonstrates how to import the necessary Alignment class and
@@ -28,12 +29,14 @@ in beginning your work with the project.
 
 2. ***Instatiating an alignment(OPA) object with ID and custom path.***
 
-        from stam_annotator.alignment import Alignment
+```python
+from stam_annotator.alignment import Alignment
 
-        alignment_path = Path("path/to/alignment")
-        alignment = Alignment("AB3CAED2A", github_token, alignment_path)
-        for segment_pair in alignment.get_segment_pairs():
-            print(segment_pair)
+alignment_path = Path("path/to/alignment")
+alignment = Alignment("AB3CAED2A", github_token, alignment_path)
+for segment_pair in alignment.get_segment_pairs():
+    print(segment_pair)
+```
 
 - Similar to the first example, this code imports the Alignment class for creating
     an alignment (OPA) object.
@@ -48,16 +51,19 @@ in beginning your work with the project.
   custom path, then it will download from the github "PechaData".
 
 
+```python
+alignment = Alignment.from_id("AB3CAED2A", github_token)
+for segment_pair in alignment.get_segment_pairs():
+    for text, language in segment_pair:
+        print(f"{language}: {text}")
+```
 
-    alignment = Alignment.from_id("AB3CAED2A", github_token)
-    for segment_pair in alignment.get_segment_pairs():
-        for text, language in segment_pair:
-            print(f"{language}: {text}")
+With slight modification to the first example, this code snippet would output similar to below
+format:
 
-
-With slight modification to the first example, this code snippet would output the following
-
-    sa: atha vā sarvabhāvānāṃ śūnyatvāc chāśvatādayaḥ | kva kasya katamāḥ kasmāt saṃbhaviṣyanti dṛṣṭayaḥ || 29 ||
-    zh: 若亦有無邊 是二得成者 非有非無邊 是則亦應成
-    bo: ཡང་ན་དངོས་པོ་ཐམས་ཅད་དག་༑་སྟོང་ཕྱིར་རྟག་ལ་སོགས་ལྟ་བ་༑་༑ གང་དག་གང་དུ་གང་ལ་ནི་༑་༑ ༼༧༽ཅི་ལས་ཀུན་ཏུ་འབྱུང་བར་འགྱུར་༑་༑
-    en: 29. Because of the emptiness of all existing things, How will the views about “eternity,” etc., come into existence, about what, of whom, and of what kind?
+```python
+sa: atha vā sarvabhāvānāṃ śūnyatvāc chāśvatādayaḥ | kva kasya katamāḥ kasmāt saṃbhaviṣyanti dṛṣṭayaḥ || 29 ||
+zh: 若亦有無邊 是二得成者 非有非無邊 是則亦應成
+bo: ཡང་ན་དངོས་པོ་ཐམས་ཅད་དག་༑་སྟོང་ཕྱིར་རྟག་ལ་སོགས་ལྟ་བ་༑་༑ གང་དག་གང་དུ་གང་ལ་ནི་༑་༑ ༼༧༽ཅི་ལས་ཀུན་ཏུ་འབྱུང་བར་འགྱུར་༑་༑
+en: 29. Because of the emptiness of all existing things, How will the views about “eternity,” etc., come into existence, about what, of whom, and of what kind?
+```
