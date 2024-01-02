@@ -58,6 +58,27 @@ class Pecha:
         annotation_text = " ".join(annotation_text_list)
         return annotation_text
 
+    def get_annotations(self):
+        """this is for pechas with no volumes, such that only one stam is there"""
+        keys = list(self.stams.keys())
+        if len(keys) > 1:
+            """please provide the volume name as an argument as well"""
+            return
+
+        stam_name = keys[0]
+        annotations_data = {}
+        annotation_content = {}
+        for annotation in self.stams[stam_name].annotations():
+            """get annotation text, key and type"""
+            annotation_content["text"] = str(annotation)
+            annotation_data = next(annotation.__iter__())
+            annotation_content["key"] = annotation_data.key().id()
+            annotation_content["type"] = str(annotation_data.value())
+            """save annotation data in a dict with annotation id """
+            annotations_data[annotation.id()] = annotation_content
+
+        return annotations_data
+
 
 class Alignment:
     segment_source: Dict[str, Dict[str, str]]
@@ -143,7 +164,12 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 
 if __name__ == "__main__":
+    from stam_annotator.config import ROOT_DIR
+
     github_token = "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"
-    alignment = Alignment.from_id("AB3CAED2A", github_token)
-    for segment_pair in alignment.get_segment_pairs():
-        print(segment_pair)
+
+    base_path = ROOT_DIR / "P000216" / "PechaData"
+    pecha_repo = Pecha("P000216", base_path)
+    annotations = pecha_repo.get_annotations()
+    for key, value in annotations.items():
+        print(key, value)

@@ -87,6 +87,13 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
     return store
 
 
+logging.basicConfig(
+    level=logging.ERROR,  # Set the log level to ERROR or the desired level
+    filename="validation_errors.log",  # Specify the log file
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+
 def opf_to_stam_pipeline(
     pecha_id: str,
     opf_yml_file_path: Path,
