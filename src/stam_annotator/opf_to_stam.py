@@ -101,7 +101,3 @@ def opf_to_stam_pipeline(
     )
     opf_stam = opf_annotation_store_to_stam(annotation_store=opf_annotation_store)
     return opf_stam
-
-
-if __name__ == "__main__":
-    pass

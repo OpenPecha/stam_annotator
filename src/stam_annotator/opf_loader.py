@@ -88,7 +88,3 @@ def create_opf_annotation_instance(data: Dict) -> OpfAnnotation:
         revision=data["revision"],
         annotations=annotations,
     )
-
-
-if __name__ == "__main__":
-    pass

@@ -147,7 +147,3 @@ def get_alignment_annotations(
     print(f"Time taken: {elapsed_time:.2f} seconds")
 
     return alignment_annotations
-
-
-if __name__ == "__main__":
-    pass
