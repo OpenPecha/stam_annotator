@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
@@ -9,6 +10,7 @@ from stam_annotator.annotation_store import (
     convert_opf_for_pre_stam_format,
 )
 from stam_annotator.config import AnnotationGroupEnum
+from stam_annotator.exceptions import CustomDataValidationError
 from stam_annotator.opf_loader import create_opf_annotation_instance
 from stam_annotator.utility import load_opf_annotations_from_yaml
 
@@ -86,6 +88,7 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
 
 
 def opf_to_stam_pipeline(
+    pecha_id: str,
     opf_yml_file_path: Path,
     resource_file_path: Path,
     annotation_type_key: AnnotationGroupEnum,
@@ -94,8 +97,11 @@ def opf_to_stam_pipeline(
     """if there are no annotations in the opf file, return None"""
     if not opf_data_dict["annotations"]:
         return None
-    opf_obj = create_opf_annotation_instance(opf_data_dict)
-
+    try:
+        opf_obj = create_opf_annotation_instance(opf_data_dict)
+    except CustomDataValidationError as e:
+        logging.error(f"pecha id: {pecha_id}, {e.message}")
+        raise CustomDataValidationError(f"pecha id: {pecha_id}, {e.message}")
     opf_annotation_store = convert_opf_for_pre_stam_format(
         opf_obj, annotation_type_key, resource_file_path
     )

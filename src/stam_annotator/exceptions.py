@@ -16,3 +16,11 @@ class RepoCloneError(Exception):
         self.repo_name = repo_name
         self.message = f"Repo {repo_name} could not be cloned from {org_name}.\n{error}"
         super().__init__(self.message)
+
+
+class CustomDataValidationError(Exception):
+    """Raised when there is a problem with the data in repository(OpenPecha-Data)"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
