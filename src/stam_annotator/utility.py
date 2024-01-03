@@ -94,10 +94,10 @@ def load_opf_annotations_from_yaml(yaml_file):
     """standardizing the annotation data in span"""
     for annotation in data["annotations"]:
         if "span" in annotation:
-            keys_to_replace = [("start", "start_char"), ("end", "end_char")]
-            for new_key, old_key in keys_to_replace:
-                if old_key not in annotation["span"] and new_key in annotation["span"]:
-                    replace_key(annotation["span"], new_key, old_key)
+            keys_to_replace = [("start_char", "start"), ("end_char", "end")]
+            for old_key, new_key in keys_to_replace:
+                if new_key not in annotation["span"] and old_key in annotation["span"]:
+                    replace_key(annotation["span"], old_key, new_key)
 
     if isinstance(data["annotations"], list):
         annotations = {}
