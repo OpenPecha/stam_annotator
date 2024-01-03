@@ -41,20 +41,50 @@ def convert_none_to_null_in_annotations(data):
     return data
 
 
+def replace_key(dictionary, old_key, new_key):
+    if old_key in dictionary:
+        dictionary[new_key] = dictionary.pop(old_key)
+
+
 def load_opf_annotations_from_yaml(yaml_file):
     with open(yaml_file) as f:
         data = yaml.safe_load(f)
         data = convert_none_to_null_in_annotations(data)
 
-    # Check if 'annotations' key exists in the data
-    if "annotations" not in data:
-        data["annotations"] = {}
-    elif isinstance(data["annotations"], list):
-        # Convert list to dictionary with index-based keys or some form of UUIDs
+    """standardizing the data in yml files"""
+    """in some cases, the value is 'revision' and in some cases it is 'rev'"""
+    keys_to_replace = [("revision", "rev"), ("annotations", "content")]
+    for old_key, new_key in keys_to_replace:
+        if old_key not in data and new_key in data:
+            replace_key(data, new_key, old_key)
+
+    """standardizing the annotation data in span"""
+    for annotation in data["annotations"]:
+        if "span" in annotation:
+            keys_to_replace = [("start", "start_char"), ("end", "end_char")]
+            for old_key, new_key in keys_to_replace:
+                if old_key not in annotation["span"] and new_key in annotation["span"]:
+                    replace_key(annotation["span"], new_key, old_key)
+
+    """annotations key is a list in some cases, convert it to dictionary"""
+    if isinstance(data["annotations"], list) and len(data["annotations"]) == 1:
         annotation_id = get_uuid()
         data["annotations"] = {
             f"{annotation_id}": item for index, item in enumerate(data["annotations"])
         }
+        return data
+
+    if isinstance(data["annotations"], list):
+        annotations = {}
+        for _, annotation_data in enumerate(data["annotations"]):
+            annotations[annotation_data["id"]] = annotation_data
+            annotations[annotation_data["id"]].pop("id")
+        data["annotations"] = annotations
+        return data
+
+    """Check if 'annotations' key exists in the data"""
+    if "annotations" not in data:
+        data["annotations"] = {}
 
     return data
 
@@ -118,3 +148,19 @@ def convert_opf_stam_annotation_to_dictionary(
                         }
                 annotation_dict[annotation.id()]["payload"] = payload_dictionary
     return annotation_dict
+
+
+if __name__ == "__main__":
+    from stam_annotator.config import ROOT_DIR
+
+    yml_file_path = (
+        ROOT_DIR
+        / "P000003"
+        / "OpenPecha-Data"
+        / "P000003.opf"
+        / "layers"
+        / "v001"
+        / "pagination.yml"
+    )
+    opf_yml = load_opf_annotations_from_yaml(yml_file_path)
+    print(opf_yml)
