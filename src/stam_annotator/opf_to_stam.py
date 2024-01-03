@@ -56,12 +56,19 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
     # Create annotation
     for annotation in annotation_store.annotations:
         annotation_data = annotation.annotation_data
-        data = dataset.add_data(
-            annotation_data.annotation_data_key.value,
-            annotation_data.annotation_data_value.value,
-            annotation_data.annotation_data_id,
-        )
-        stam_annotation = create_annotation(
+        data = [
+            {
+                "id": get_uuid(),
+                "key": annotation_data.annotation_data_key.value,
+                "value": annotation_data.annotation_data_value.value,
+                "set": dataset.id(),
+            }
+        ]
+        if annotation.payloads:
+            for key, value in annotation.payloads.items():
+                data.append({"key": key, "value": value, "set": dataset.id()})
+
+        _ = create_annotation(
             store=store,
             id=annotation.annotation_id,
             target=Selector.textselector(
@@ -71,19 +78,6 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
             data=data,
         )
 
-        # Creating annotation for meta data
-        if not annotation.payloads:
-            continue
-
-        create_annotation(
-            store=store,
-            target=Selector.annotationselector(stam_annotation),
-            data=[
-                {"id": get_uuid(), "key": key, "value": value, "set": dataset.id()}
-                for key, value in annotation.payloads.items()
-            ],
-            id=get_uuid(),
-        )
     return store
 
 
