@@ -86,7 +86,7 @@ class Pecha:
             """save annotation data in a dict with annotation id """
             annotation_content["text"] = str(annotation)
             if annotation_payloads:
-                annotation_content["meta_data"] = annotation_payloads
+                annotation_content["payloads"] = annotation_payloads
             annotations_dict[annotation.id()] = annotation_content
         return annotations_dict
 
