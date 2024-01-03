@@ -8,6 +8,7 @@ from stam import AnnotationStore
 
 from stam_annotator.config import PECHAS_PATH, AnnotationEnum, AnnotationGroupEnum
 from stam_annotator.exceptions import RepoCloneError, RepoDoesNotExist
+from stam_annotator.utility import get_enum_value_if_match_ignore_case
 
 ORGANIZATION = "PechaData"
 
@@ -70,11 +71,22 @@ class Pecha:
         for annotation in annotations:
             """get annotation text, key and type"""
             annotation_content = {}
-            annotation_content["text"] = str(annotation)
-            annotation_data = next(annotation.__iter__())
-            annotation_content["annotation_group"] = annotation_data.key().id()
-            annotation_content["annotation"] = str(annotation_data.value())
+            annotation_payloads = {}
+            for annotation_data in annotation:
+                key, value = annotation_data.key().id(), str(annotation_data.value())
+                matched_enum = get_enum_value_if_match_ignore_case(
+                    AnnotationGroupEnum, key
+                )
+                if matched_enum:
+                    annotation_content["annotation_group"] = key
+                    annotation_content["annotation"] = value
+                else:
+                    annotation_payloads[key] = value
+
             """save annotation data in a dict with annotation id """
+            annotation_content["text"] = str(annotation)
+            if annotation_payloads:
+                annotation_content["meta_data"] = annotation_payloads
             annotations_dict[annotation.id()] = annotation_content
         return annotations_dict
 
@@ -186,6 +198,8 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 if __name__ == "__main__":
 
     github_token = ""
+
+    from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
 
     pecha_repo = Pecha.from_id("P000216", github_token)
     annotation_group = AnnotationGroupEnum.structure_type
