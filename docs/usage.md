@@ -90,6 +90,8 @@ annotations = pecha_repo.get_annotations()
     creates an object based on that ID.
 - The method get_annotations() returns a dictionary with annotation_id as key and annotation
     text, its annotation group and annotation type as value.
+- If payloads such as page number,... are present in the pecha OPF then it will
+    also be included in the dictionary in the feature 'payloads'.
 - Note that pecha OPF is downloaded automatically from the
     GitHub repository if they are not already present in the local directory.
 
@@ -98,6 +100,7 @@ for key, value in annotations.items():
     print(key, value)
 ```
 With a simple code to print the dictionary we get the following output:
+
 ```
 64e5e6da40f74b34a74e85061e5d12eb {'text': '༼༡ཨ༡༽རྒྱ་གར་སྐད་དུ་༑་༑་པྲ་ཛཉའ་ནའ་མ་མའུ་ལ་མ་དྷཡའ་མ་ཀ་ཀའ་རི་ཀ་༑་བོད་སྐད་དུ་༑་༑་དབུ་མ་རྩ་བའི་ཚིག་ལེའུར་བྱས་པ་ཤེས་རབ་ཅེས་བྱ་བ་༑', 'annotation_group': 'Structure Type', 'annotation': 'Segment'}
 3455712c037c4992a00f8f21ff533773 {'text': 'འཇམ་དཔལ་གཞོན་ནུར་གྱུར་པ ༼༢༽ལ་ཕྱག་འཚལ་ལོ་༑་༑', 'annotation_group': 'Structure Type', 'annotation': 'Segment'}
