@@ -67,13 +67,14 @@ class Pecha:
 
         stam_name = keys[0]
         annotations_data = {}
-        annotation_content = {}
+
         for annotation in self.stams[stam_name].annotations():
             """get annotation text, key and type"""
+            annotation_content = {}
             annotation_content["text"] = str(annotation)
             annotation_data = next(annotation.__iter__())
-            annotation_content["key"] = annotation_data.key().id()
-            annotation_content["type"] = str(annotation_data.value())
+            annotation_content["annotation_group"] = annotation_data.key().id()
+            annotation_content["annotation"] = str(annotation_data.value())
             """save annotation data in a dict with annotation id """
             annotations_data[annotation.id()] = annotation_content
 
@@ -161,15 +162,3 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
     except subprocess.CalledProcessError as e:
         raise RepoCloneError(org, repo_name, e)
-
-
-if __name__ == "__main__":
-    from stam_annotator.config import ROOT_DIR
-
-    github_token = "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"
-
-    base_path = ROOT_DIR / "P000216" / "PechaData"
-    pecha_repo = Pecha("P000216", base_path)
-    annotations = pecha_repo.get_annotations()
-    for key, value in annotations.items():
-        print(key, value)
