@@ -86,7 +86,7 @@ annotations = pecha_repo.get_annotations()
   ID "AB3CAED2A".
 - This code snippet demonstrates how to import the necessary Pecha class and
     create an Pecha (OPF) object.
-- The from_id method is used here. It requires an alignment ID and github token
+- The from_id method is used here. It requires an pecha ID and github token
     creates an object based on that ID.
 - The method get_annotations() returns a dictionary with annotation_id as key and annotation
     text, its annotation group and annotation type as value.
@@ -105,4 +105,61 @@ efa17c3f05854dc6947e05648aa20f3f {'text': 'གང་གིས་རྟེན་�
 9247779d2d5f41b2bee43cd3474b9814 {'text': 'བདག་ལས་མ་ཡིན་གཞན་ལས་མིན་༑་༑་གཉིས་ལས་མ་ཡིན་རྒྱུ་མེད་མིན་༑་༑ དངོས་པོ་གང ༼༤༽དག་གང་ན་ཡང་༑་༑་སྐྱེ་བ་ནམ་ཡང་ཡོད་མ་ཡིན་༑་༑', 'annotation_group': 'Structure Type', 'annotation': 'Segment'}
 fbb8ee887213447aa4f7ea6292880cc4 {'text': 'རྐྱེན་རྣམ་བཞི་སྟེ་རྒྱུ་དང་ནི་༑་༑་དམིགས་པ་དང་ནི་དེ་མ་ཐག་༑་༑ བདག་པོ་ཡང་ནི་དེ་བཞིན་ཏེ་༑་༑་རྐྱེན་ལྔ་པ་ནི་ཡོད་མ་ཡིན་༑་༑', 'annotation_group': 'Structure Type', 'annotation': 'Segment'}
 1c962467f2e54424a3b8bfaf2c146b49 {'text': 'དངོས་པོ་རྣམས་ཀྱི ༼༥༽རང་བཞིན་ནི་༑་༑་རྐྱེན་ལ་སོགས་ལ་ཡོད་མ་ཡིན་༑་༑ བདག་གི་དངོས་པོ་ཡོད་མིན་ན་༑་༑་གཞན་དངོས་ཡོད་པ་མ་ཡིན་ནོ་༑་༑', 'annotation_group': 'Structure Type', 'annotation': 'Segment'}
+```
+
+
+2. ***Instatiating an pecha(OPF) object ID and custom path.***
+
+```python
+from stam_annotator.alignment import Pecha
+
+pecha_path = Path("path/to/pecha")
+pecha_repo = Pecha.from_id("I96CFA399", pecha_path)
+annotations = pecha_repo.get_annotations()
+
+```
+
+- The above ID "I96CFA399" is one of the pecha related to above alignment with
+  ID "AB3CAED2A".
+- This code snippet demonstrates how to import the necessary Pecha class and
+    create an Pecha (OPF) object.
+- Here the pecha object is created with  ID and custom path.
+- The method get_annotations() returns a dictionary with annotation_id as key and annotation
+    text, its annotation group and annotation type as value.
+
+3. ***Filtering annotations from pecha(OPF)***
+
+
+```python
+from stam_annotator.config import AnnotationGroupEnum, AnnotationEnum
+
+pecha_repo = Pecha.from_id("P000216", github_token)
+annotation_group = AnnotationGroupEnum.structure_type
+annotation_type = AnnotationEnum.author
+annotations = pecha_repo.get_annotations(annotation_group, annotation_type)
+for key, value in annotations.items():
+    print(key, value)
+```
+
+- To filter the annotations from the pecha object we need to pass the annotation group
+    and annotation type.
+- The annotation group and type must be from the AnnotationGroupEnum and AnnotationEnum
+    respectively.
+- Below are the list of annotation groups and types available in the pecha repository.
+
+```
+class AnnotationGroupEnum(Enum):
+    structure_type = "Structure Type"
+    translation = "Translation"
+
+
+class AnnotationEnum(Enum):
+    index = "index"
+    book_title = "BookTitle"
+    sub_title = "SubTitle"
+    book_number = "BookNumber"
+    poti_title = "PotiTitle"
+    author = "Author"
+    chapter = "Chapter"
+    quotation = "Quotation"
 ```
