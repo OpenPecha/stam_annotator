@@ -22,24 +22,26 @@ need to install them manually.
 ## 2. Installation
 
 2.1 Create a virtual environment.
-
-        python3 - venv .venv
+```python
+python3 -m venv .venv
+```
 
 2.2 Activate the virtual environment.
 
 2.2.1 For linux and mac
-
-        source .venv/bin/activate
-
+```
+source .venv/bin/activate
+```
 2.2.2 For windows
-
-        .\venv\Scripts\activate
-
+```
+.\venv\Scripts\activate
+```
 
 2.3  Install the package
 
-        pip install git+https://github.com/OpenPecha/stam_annotator.git
-
+```python
+pip install git+https://github.com/OpenPecha/stam_annotator.git
+```
 
 
 ## 3. Troubleshooting

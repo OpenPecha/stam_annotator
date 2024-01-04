@@ -94,11 +94,11 @@ class PechaRepo:
             stams_count = len(stams_in_dir)
             if stams_count == 0:
                 continue
-            curr_stam = (
+            combined_stam = (
                 stams_in_dir[0] if stams_count == 1 else combine_stams(stams_in_dir)
             )
             save_annotation_store(
-                curr_stam, new_parent_dir / f"{parent_dir.name}.opf.json"
+                combined_stam, new_parent_dir / f"{parent_dir.name}.opf.json"
             )
 
     def upload_pecha_repo(self):
@@ -197,6 +197,7 @@ class AlignmentRepo:
         self.load_pecha_repos()
         for _, pecha in self.pecha_repos.items():
             pecha.get_pecha_repo()
+            pecha.convert_pecha_repo_to_stam()
 
     def upload_aligned_pechas(self):
         for _, pecha_repo in self.pecha_repos.items():
@@ -301,7 +302,7 @@ class CustomEncoder(JSONEncoder):
 
 
 if __name__ == "__main__":
-
-    pecha_repo = PechaRepo.from_id("P000218")
-    # pecha_repo.get_pecha_repo()
+    pecha_repo = PechaRepo.from_id("P000216")
+    pecha_repo.get_pecha_repo()
     pecha_repo.convert_pecha_repo_to_stam()
+    pecha_repo.upload_pecha_repo()
