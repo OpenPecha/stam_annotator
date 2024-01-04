@@ -53,6 +53,18 @@ class Pecha:
         cls.base_path = out_path / f"{id_}"
         return cls(id_, cls.base_path)
 
+    def get_meta_data(self):
+        for file_path in self.base_path.rglob("meta.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
+
+    def get_index_data(self):
+        for file_path in self.base_path.rglob("index.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
+
     def get_annotation(self, id_: str, pecha_stam_name) -> str:
         """stam returns annotation texts in a list, so we join them"""
         annotation_text_list = self.stams[pecha_stam_name].annotation(id_).text()
@@ -199,15 +211,3 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
     except subprocess.CalledProcessError as e:
         raise RepoCloneError(org, repo_name, e)
-
-
-if __name__ == "__main__":
-
-    from stam_annotator.github_token import GITHUB_TOKEN
-
-    github_token = GITHUB_TOKEN
-
-    alignment = Alignment.from_id("AB3CAED2A", github_token)
-    meta_data = alignment.get_meta_data()
-    for key, value in meta_data.items():
-        print(f"{key}:", value)

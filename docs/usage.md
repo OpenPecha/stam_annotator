@@ -192,3 +192,49 @@ class AnnotationEnum(Enum):
     chapter = "Chapter"
     quotation = "Quotation"
 ```
+
+3. ***Fetching meta data from pecha(OPF)***
+```python
+pecha_repo = Pecha.from_id("I1A92E2D9", github_token)
+meta_data = pecha_repo.get_meta_data()
+for key, value in meta_data.items():
+    print(f"{key}:", value)
+```
+
+
+*Note that if the pecha does not contain any meta data then it will return an empty dictionary.*
+
+The above code snippet will output the following:
+
+```
+id: I1A92E2D9
+default_language: sa
+source: https://www2.hf.uio.no/polyglotta/index.php?page=library&bid=2
+initial_creation_type: input
+imported: 2023-02-10 00:29:33
+last_modified: 2023-02-10 00:29:33
+source_metadata: {'title': 'Nāgārjuna: Mūlamadhyamakakārikā', 'language': 'sa'}
+bases: {'ABFB': {'base_file': 'ABFB.txt', 'order': 1}}
+copyright: {'status': 'Unknown', 'notice': ''}
+```
+
+
+4. ***Fetching index data from pecha(OPF)***
+```python
+pecha_repo = Pecha.from_id("I1A92E2D9", github_token)
+index_data = pecha_repo.get_index_data()
+for key, value in index_data.items():
+    print(f"{key}:", value)
+```
+
+
+*Note that if the pecha does not contain any index data then it will return an empty dictionary.*
+
+The above code snippet will output the following:
+
+```
+id: ab39928ac6484f6d947ad64526c8086b
+annotation_type: index
+revision: 00001
+annotations: {'260393c848b4409b97bd2167b5e346a0': {'base': 'ABFB.txt', 'Chapters': [{'title': 'Title', 'span': {'start': 0, 'end': 32}}, {'title': 'Preface', 'span': {'start': 33, 'end': 214}}, {'title': 'Chapters I-V', 'span': {'start': 215, 'end': 7017}}, {'title': 'Chapters VI-X', 'span': {'start': 7018, 'end': 15936}}, {'title': 'Chapters XI-XV', 'span': {'start': 15937, 'end': 20852}}, {'title': 'Chapters XVI-XX', 'span': {'start': 20853, 'end': 29886}}, {'title': 'Chapters XXI-XXV', 'span': {'start': 29887, 'end': 43088}}, {'title': 'Chapters XXVI-XXVII', 'span': {'start': 43089, 'end': 47485}}, {'title': 'Colophon', 'span': {'start': 47486, 'end': 47496}}]}}
+```
