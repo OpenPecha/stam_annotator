@@ -70,6 +70,32 @@ bo: ཡང་ན་དངོས་པོ་ཐམས་ཅད་དག་༑་�
 en: 29. Because of the emptiness of all existing things, How will the views about “eternity,” etc., come into existence, about what, of whom, and of what kind?
 ```
 
+
+2. ***Fetching meta data from alignment(OPA)***
+
+```python
+alignment = Alignment.from_id("AB3CAED2A", github_token)
+meta_data = alignment.get_meta_data()
+for key, value in meta_data.items():
+    print(f"{key}:", value)
+```
+
+
+*Note that if the alignment does not contain any meta data then it will return an empty dictionary.*
+
+The above code snippet will output the following:
+
+```
+id: AB3CAED2A
+title: Nāgārjuna: Mūlamadhyamakakārikā
+type: translation
+pechas: ['I1A92E2D9', 'I5E597420', 'I96CFA399', 'IB44CB601', 'ID5FCF98D', 'I1E23F295', 'I060C85E6', 'IB0995F57', 'I998010B3', 'I9D4ABAEF']
+source_metadata: {'languages': ['sa', 'zh', 'bo', 'en'], 'datatype': 'PlainText', 'created_at': '2023-02-10 00:31:44', 'last_modified_at': '2023-02-10 00:31:44'}
+alignment_to_base: {'I1A92E2D9/ABFB': '9103', 'I5E597420/894F': '9103', 'I96CFA399/13AB': '9103', 'IB44CB601/308F': '9103', 'ID5FCF98D/1018': '9103', 'I1E23F295/5E06': '9103', 'I060C85E6/8BA2': '9103', 'IB0995F57/2087': '9103', 'I998010B3/C8EC': '9103', 'I9D4ABAEF/44E4': '9103'}
+```
+
+
+
 ## Pecha (OPF) Repository
 
 1. ***Instatiating an pecha(OPF) object with just ID.***

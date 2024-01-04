@@ -137,6 +137,12 @@ class Alignment:
         for id_ in self.segment_source.keys():
             self.pechas[id_] = Pecha.from_id(id_, self.github_token)
 
+    def get_meta_data(self):
+        for file_path in self.base_path.rglob("meta.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
+
     def get_segment_pairs(self):
         for id_ in self.segment_pairs:
             yield self.get_segment_pair(id_)
@@ -197,13 +203,11 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 if __name__ == "__main__":
 
-    github_token = ""
+    from stam_annotator.github_token import GITHUB_TOKEN
 
-    from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
+    github_token = GITHUB_TOKEN
 
-    pecha_repo = Pecha.from_id("P000216", github_token)
-    annotation_group = AnnotationGroupEnum.structure_type
-    annotation_type = AnnotationEnum.author
-    annotations = pecha_repo.get_annotations(annotation_group, annotation_type)
-    for key, value in annotations.items():
-        print(key, value)
+    alignment = Alignment.from_id("AB3CAED2A", github_token)
+    meta_data = alignment.get_meta_data()
+    for key, value in meta_data.items():
+        print(f"{key}:", value)
