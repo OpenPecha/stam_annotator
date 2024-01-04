@@ -1,4 +1,6 @@
+import csv
 from pathlib import Path
+from typing import Dict, List
 
 import requests
 from github import Github
@@ -37,8 +39,29 @@ def download_file_with_link(url, destination_folder_path: Path):
         print(f"Failed to download: {response.status_code}")
 
 
-if __name__ == "__main__":
-    from stam_annotator.github_token import GITHUB_TOKEN
+def extract_column_from_csv(csv_file_path, column_name) -> list:
+    column_values = []
+    with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if column_name in row:
+                column_values.append(row[column_name])
+    return column_values
 
-    destination_folder_path = ROOT_DIR / "data"
-    download_openpecha_opa_opf_catalog(GITHUB_TOKEN, destination_folder_path)
+
+def categorize_file_names_by_initial(file_names: List[str]) -> Dict[str, List[str]]:
+    categorized_file_names: Dict[str, List[str]] = {}
+    for file_name in file_names:
+        initial = file_name[0]
+        if initial not in categorized_file_names:
+            categorized_file_names[initial] = []
+        categorized_file_names[initial].append(file_name)
+    return categorized_file_names
+
+
+if __name__ == "__main__":
+    opf_catalog_file_path = ROOT_DIR / "data" / "opf_catalog.csv"
+    file_names = extract_column_from_csv(opf_catalog_file_path, "Pecha ID")
+    categorized_file_names = categorize_file_names_by_initial(file_names)
+    for initial, file_names in categorized_file_names.items():
+        print(initial, len(file_names))
