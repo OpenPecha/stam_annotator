@@ -53,6 +53,18 @@ class Pecha:
         cls.base_path = out_path / f"{id_}"
         return cls(id_, cls.base_path)
 
+    def get_meta_data(self):
+        for file_path in self.base_path.rglob("meta.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
+
+    def get_index_data(self):
+        for file_path in self.base_path.rglob("index.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
+
     def get_annotation(self, id_: str, pecha_stam_name) -> str:
         """stam returns annotation texts in a list, so we join them"""
         annotation_text_list = self.stams[pecha_stam_name].annotation(id_).text()
@@ -137,6 +149,12 @@ class Alignment:
         for id_ in self.segment_source.keys():
             self.pechas[id_] = Pecha.from_id(id_, self.github_token)
 
+    def get_meta_data(self):
+        for file_path in self.base_path.rglob("meta.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
+
     def get_segment_pairs(self):
         for id_ in self.segment_pairs:
             yield self.get_segment_pair(id_)
@@ -193,17 +211,3 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
     except subprocess.CalledProcessError as e:
         raise RepoCloneError(org, repo_name, e)
-
-
-if __name__ == "__main__":
-
-    github_token = ""
-
-    from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
-
-    pecha_repo = Pecha.from_id("P000216", github_token)
-    annotation_group = AnnotationGroupEnum.structure_type
-    annotation_type = AnnotationEnum.author
-    annotations = pecha_repo.get_annotations(annotation_group, annotation_type)
-    for key, value in annotations.items():
-        print(key, value)
