@@ -1,14 +1,14 @@
 import json
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from github import Github, GithubException
 from stam import AnnotationStore
 
-from stam_annotator.config import PECHAS_PATH
+from stam_annotator.config import PECHAS_PATH, AnnotationEnum, AnnotationGroupEnum
 from stam_annotator.exceptions import RepoCloneError, RepoDoesNotExist
-from stam_annotator.github_token import GITHUB_TOKEN
+from stam_annotator.utility import get_enum_value_if_match_ignore_case
 
 ORGANIZATION = "PechaData"
 
@@ -25,9 +25,11 @@ class Pecha:
         return self.base_path / f"{self.id_}.opf" / "layers"
 
     def load_stams(self):
-        json_files = list(self.pecha_fn.glob("**/*.json"))
+        json_files = list(self.pecha_fn.glob("**/*.opf.json"))
         for json_file in json_files:
-            self.stams[json_file.parent.name] = AnnotationStore(file=str(json_file))
+            index = json_file.name.index(".opf.json")
+            stam_name = json_file.name[:index]
+            self.stams[stam_name] = AnnotationStore(file=str(json_file))
 
     @classmethod
     def from_id(cls, id_: str, github_token: str, out_path: Path = PECHAS_PATH):
@@ -56,6 +58,58 @@ class Pecha:
         annotation_text_list = self.stams[pecha_stam_name].annotation(id_).text()
         annotation_text = " ".join(annotation_text_list)
         return annotation_text
+
+    def get_stam_name(self):
+        keys = list(self.stams.keys())
+        if len(keys) != 1:
+            print("Please provide the volume name as an argument as well.")
+            return None
+        return keys[0]
+
+    def get_stam_annotations_in_dict_format(self, annotations) -> Dict:
+        annotations_dict = {}
+        for annotation in annotations:
+            """get annotation text, key and type"""
+            annotation_content = {}
+            annotation_payloads = {}
+            for annotation_data in annotation:
+                key, value = annotation_data.key().id(), str(annotation_data.value())
+                matched_enum = get_enum_value_if_match_ignore_case(
+                    AnnotationGroupEnum, key
+                )
+                if matched_enum:
+                    annotation_content["annotation_group"] = key
+                    annotation_content["annotation"] = value
+                else:
+                    annotation_payloads[key] = value
+
+            """save annotation data in a dict with annotation id """
+            annotation_content["text"] = str(annotation)
+            if annotation_payloads:
+                annotation_content["payloads"] = annotation_payloads
+            annotations_dict[annotation.id()] = annotation_content
+        return annotations_dict
+
+    def get_annotations(
+        self,
+        annotation_group: Optional[AnnotationGroupEnum] = None,
+        annotation_type: Optional[AnnotationEnum] = None,
+    ) -> Optional[Dict]:
+        """this is for pechas with no volumes, such that only one stam is there"""
+        stam_name = self.get_stam_name()
+        if annotation_group is None or annotation_type is None:
+            stam_annotations = self.stams[stam_name].annotations()
+        else:
+            stam_name = self.get_stam_name()
+            stam_annotation_store = self.stams[stam_name]
+            stam_dataset = next(stam_annotation_store.datasets())
+            stam_key = stam_dataset.key(annotation_group.value)
+            stam_annotations = stam_annotation_store.annotations(
+                filter=stam_key, value=annotation_type.value
+            )
+
+        annotations_dict = self.get_stam_annotations_in_dict_format(stam_annotations)
+        return annotations_dict
 
 
 class Alignment:
@@ -142,4 +196,14 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
 
 
 if __name__ == "__main__":
-    alignment = Pecha.from_id("I5E597420", GITHUB_TOKEN)
+
+    github_token = ""
+
+    from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
+
+    pecha_repo = Pecha.from_id("P000216", github_token)
+    annotation_group = AnnotationGroupEnum.structure_type
+    annotation_type = AnnotationEnum.author
+    annotations = pecha_repo.get_annotations(annotation_group, annotation_type)
+    for key, value in annotations.items():
+        print(key, value)
