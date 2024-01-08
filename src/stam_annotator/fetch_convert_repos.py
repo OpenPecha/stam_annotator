@@ -1,4 +1,5 @@
 import csv
+import logging
 from pathlib import Path
 from typing import Dict, List
 
@@ -6,6 +7,7 @@ import requests
 from github import Github
 
 from stam_annotator.config import ROOT_DIR
+from stam_annotator.convert_to_stam import PechaRepo
 
 REPO_OWNER = "OpenPecha-Data"
 REPO_NAME = "catalog"
@@ -49,19 +51,35 @@ def extract_column_from_csv(csv_file_path, column_name) -> list:
     return column_values
 
 
-def categorize_file_names_by_initial(file_names: List[str]) -> Dict[str, List[str]]:
-    categorized_file_names: Dict[str, List[str]] = {}
-    for file_name in file_names:
-        initial = file_name[0]
-        if initial not in categorized_file_names:
-            categorized_file_names[initial] = []
-        categorized_file_names[initial].append(file_name)
-    return categorized_file_names
+def categorize_strings_by_initial(strings: List[str]) -> Dict[str, List[str]]:
+    categorized_strings: Dict[str, List[str]] = {}
+    for string in strings:
+        initial_char = string[0]
+        if initial_char not in categorized_strings:
+            categorized_strings[initial_char] = []
+        categorized_strings[initial_char].append(string)
+    return categorized_strings
 
+
+def convert_opf_files_to_stam(pecha_ids: List[str]):
+    for pecha_id in pecha_ids:
+        try:
+            pecha_repo = PechaRepo.from_id(pecha_id)
+            pecha_repo.get_pecha_repo()
+            pecha_repo.convert_pecha_repo_to_stam()
+        except Exception as e:
+            logging.error(f"pecha id: {pecha_id}, {e}")
+
+
+logging.basicConfig(
+    level=logging.ERROR,  # Set the log level to ERROR or the desired level
+    filename="convertion_errors.log",  # Specify the log file
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 if __name__ == "__main__":
     opf_catalog_file_path = ROOT_DIR / "data" / "opf_catalog.csv"
-    file_names = extract_column_from_csv(opf_catalog_file_path, "Pecha ID")
-    categorized_file_names = categorize_file_names_by_initial(file_names)
-    for initial, file_names in categorized_file_names.items():
-        print(initial, len(file_names))
+    pecha_ids = extract_column_from_csv(opf_catalog_file_path, "Pecha ID")
+    categorized_pecha_ids = categorize_strings_by_initial(pecha_ids)
+    initial_D_pecha_ids = categorized_pecha_ids["D"]
+    convert_opf_files_to_stam(initial_D_pecha_ids)
