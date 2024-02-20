@@ -12,7 +12,7 @@
 ## Description
 
 A python package meant for working with annotations from alignment(OPA) and pecha(OPF) repos in "PechaData".
-PechaData is github page which contains same data as OpenPecha-Data but in a different format name STAM.
+PechaData is github page which contains same data as OpenPecha-Data but in a different format [named STAM](https://github.com/annotation/stam).
 
 Stand-off Text Annotation Model (STAM) is a data model for stand-off-text annotation where any information on a text is represented as an annotation.
 
