@@ -1,3 +1,4 @@
+import json
 import subprocess
 from pathlib import Path
 from typing import Dict, Optional
@@ -51,6 +52,18 @@ class Pecha:
 
         cls.base_path = out_path / f"{id_}"
         return cls(id_, cls.base_path)
+
+    def get_meta_data(self):
+        for file_path in self.base_path.rglob("meta.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
+
+    def get_index_data(self):
+        for file_path in self.base_path.rglob("index.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
 
     def get_annotation(self, id_: str, pecha_stam_name) -> str:
         """stam returns annotation texts in a list, so we join them"""

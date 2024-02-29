@@ -37,6 +37,12 @@ class Alignment:
         for id_ in self.segment_source.keys():
             self.pechas[id_] = Pecha.from_id(id_, self.github_token)
 
+    def get_meta_data(self):
+        for file_path in self.base_path.rglob("meta.json"):
+            with file_path.open() as file:
+                return json.load(file)
+        return {}
+
     def get_segment_pairs(self):
         for id_ in self.segment_pairs:
             yield self.get_segment_pair(id_)

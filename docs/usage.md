@@ -9,7 +9,7 @@ in beginning your work with the project.
 1. ***Instatiating an alignment(OPA) object with just ID.***
 
 ```python
-from stam_annotator.alignment import Alignment
+from stam_annotator.stam_fetcher.alignment import Alignment
 
 alignment = Alignment.from_id("AB3CAED2A", github_token)
 for segment_pair in alignment.get_segment_pairs():
@@ -32,7 +32,7 @@ for segment_pair in alignment.get_segment_pairs():
 2. ***Instatiating an alignment(OPA) object with ID and custom path.***
 
 ```python
-from stam_annotator.alignment import Alignment
+from stam_annotator.stam_fetcher.alignment import Alignment
 
 alignment_path = Path("path/to/alignment")
 alignment = Alignment("AB3CAED2A", github_token, alignment_path)
@@ -70,12 +70,38 @@ bo: ཡང་ན་དངོས་པོ་ཐམས་ཅད་དག་༑་�
 en: 29. Because of the emptiness of all existing things, How will the views about “eternity,” etc., come into existence, about what, of whom, and of what kind?
 ```
 
+
+2. ***Fetching meta data from alignment(OPA)***
+
+```python
+alignment = Alignment.from_id("AB3CAED2A", github_token)
+meta_data = alignment.get_meta_data()
+for key, value in meta_data.items():
+    print(f"{key}:", value)
+```
+
+
+*Note that if the alignment does not contain any meta data then it will return an empty dictionary.*
+
+The above code snippet will output the following:
+
+```
+id: AB3CAED2A
+title: Nāgārjuna: Mūlamadhyamakakārikā
+type: translation
+pechas: ['I1A92E2D9', 'I5E597420', 'I96CFA399', 'IB44CB601', 'ID5FCF98D', 'I1E23F295', 'I060C85E6', 'IB0995F57', 'I998010B3', 'I9D4ABAEF']
+source_metadata: {'languages': ['sa', 'zh', 'bo', 'en'], 'datatype': 'PlainText', 'created_at': '2023-02-10 00:31:44', 'last_modified_at': '2023-02-10 00:31:44'}
+alignment_to_base: {'I1A92E2D9/ABFB': '9103', 'I5E597420/894F': '9103', 'I96CFA399/13AB': '9103', 'IB44CB601/308F': '9103', 'ID5FCF98D/1018': '9103', 'I1E23F295/5E06': '9103', 'I060C85E6/8BA2': '9103', 'IB0995F57/2087': '9103', 'I998010B3/C8EC': '9103', 'I9D4ABAEF/44E4': '9103'}
+```
+
+
+
 ## Pecha (OPF) Repository
 
 1. ***Instatiating an pecha(OPF) object with just ID.***
 
 ```python
-from stam_annotator.alignment import Pecha
+from stam_annotator.stam_fetcher.pecha import Pecha
 
 pecha_repo = Pecha.from_id("I96CFA399", github_token)
 annotations = pecha_repo.get_annotations()
@@ -114,7 +140,7 @@ fbb8ee887213447aa4f7ea6292880cc4 {'text': 'རྐྱེན་རྣམ་བཞ�
 2. ***Instatiating an pecha(OPF) object ID and custom path.***
 
 ```python
-from stam_annotator.alignment import Pecha
+from stam_annotator.stam_fetcher.pecha import Pecha
 
 pecha_path = Path("path/to/pecha")
 pecha_repo = Pecha.from_id("I96CFA399", pecha_path)
@@ -165,4 +191,50 @@ class AnnotationEnum(Enum):
     author = "Author"
     chapter = "Chapter"
     quotation = "Quotation"
+```
+
+3. ***Fetching meta data from pecha(OPF)***
+```python
+pecha_repo = Pecha.from_id("I1A92E2D9", github_token)
+meta_data = pecha_repo.get_meta_data()
+for key, value in meta_data.items():
+    print(f"{key}:", value)
+```
+
+
+*Note that if the pecha does not contain any meta data then it will return an empty dictionary.*
+
+The above code snippet will output the following:
+
+```
+id: I1A92E2D9
+default_language: sa
+source: https://www2.hf.uio.no/polyglotta/index.php?page=library&bid=2
+initial_creation_type: input
+imported: 2023-02-10 00:29:33
+last_modified: 2023-02-10 00:29:33
+source_metadata: {'title': 'Nāgārjuna: Mūlamadhyamakakārikā', 'language': 'sa'}
+bases: {'ABFB': {'base_file': 'ABFB.txt', 'order': 1}}
+copyright: {'status': 'Unknown', 'notice': ''}
+```
+
+
+4. ***Fetching index data from pecha(OPF)***
+```python
+pecha_repo = Pecha.from_id("I1A92E2D9", github_token)
+index_data = pecha_repo.get_index_data()
+for key, value in index_data.items():
+    print(f"{key}:", value)
+```
+
+
+*Note that if the pecha does not contain any index data then it will return an empty dictionary.*
+
+The above code snippet will output the following:
+
+```
+id: ab39928ac6484f6d947ad64526c8086b
+annotation_type: index
+revision: 00001
+annotations: {'260393c848b4409b97bd2167b5e346a0': {'base': 'ABFB.txt', 'Chapters': [{'title': 'Title', 'span': {'start': 0, 'end': 32}}, {'title': 'Preface', 'span': {'start': 33, 'end': 214}}, {'title': 'Chapters I-V', 'span': {'start': 215, 'end': 7017}}, {'title': 'Chapters VI-X', 'span': {'start': 7018, 'end': 15936}}, {'title': 'Chapters XI-XV', 'span': {'start': 15937, 'end': 20852}}, {'title': 'Chapters XVI-XX', 'span': {'start': 20853, 'end': 29886}}, {'title': 'Chapters XXI-XXV', 'span': {'start': 29887, 'end': 43088}}, {'title': 'Chapters XXVI-XXVII', 'span': {'start': 43089, 'end': 47485}}, {'title': 'Colophon', 'span': {'start': 47486, 'end': 47496}}]}}
 ```
