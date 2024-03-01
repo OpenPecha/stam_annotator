@@ -18,13 +18,13 @@ class Pecha:
         self.id_ = id_
         self.base_path = base_path
         self.stams: Dict[str, AnnotationStore] = {}
-        self.load_stams()
+        self.load_pecha()
 
     @property
     def pecha_fn(self):
         return self.base_path / f"{self.id_}.opf" / "layers"
 
-    def load_stams(self):
+    def load_pecha(self):
         json_files = list(self.pecha_fn.glob("**/*.opf.json"))
         for json_file in json_files:
             index = json_file.name.index(".opf.json")
@@ -71,14 +71,14 @@ class Pecha:
         annotation_text = " ".join(annotation_text_list)
         return annotation_text
 
-    def get_stam_name(self):
+    def get_annotation_types(self):
         keys = list(self.stams.keys())
         if len(keys) != 1:
             print("Please provide the volume name as an argument as well.")
             return None
         return keys[0]
 
-    def get_stam_annotations_in_dict_format(self, annotations) -> Dict:
+    def format_annotations_as_dict(self, annotations) -> Dict:
         annotations_dict = {}
         for annotation in annotations:
             """get annotation text, key and type"""
@@ -102,17 +102,17 @@ class Pecha:
             annotations_dict[annotation.id()] = annotation_content
         return annotations_dict
 
-    def get_annotations(
+    def get_filtered_annotations(
         self,
         annotation_group: Optional[AnnotationGroupEnum] = None,
         annotation_type: Optional[AnnotationEnum] = None,
     ) -> Optional[Dict]:
         """this is for pechas with no volumes, such that only one stam is there"""
-        stam_name = self.get_stam_name()
+        stam_name = self.get_annotation_types()
         if annotation_group is None or annotation_type is None:
             stam_annotations = self.stams[stam_name].annotations()
         else:
-            stam_name = self.get_stam_name()
+            stam_name = self.get_annotation_types()
             stam_annotation_store = self.stams[stam_name]
             stam_dataset = next(stam_annotation_store.datasets())
             stam_key = stam_dataset.key(annotation_group.value)
@@ -120,7 +120,7 @@ class Pecha:
                 filter=stam_key, value=annotation_type.value
             )
 
-        annotations_dict = self.get_stam_annotations_in_dict_format(stam_annotations)
+        annotations_dict = self.format_annotations_as_dict(stam_annotations)
         return annotations_dict
 
 
@@ -153,6 +153,6 @@ if __name__ == "__main__":
     pecha_repo = Pecha.from_id("P000216", github_token)
     annotation_group = AnnotationGroupEnum.structure_type
     annotation_type = AnnotationEnum.author
-    annotations = pecha_repo.get_annotations(annotation_group, annotation_type)
+    annotations = pecha_repo.get_filtered_annotations(annotation_group, annotation_type)
     for key, value in annotations.items():
         print(key, value)
