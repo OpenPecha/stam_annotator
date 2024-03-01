@@ -106,7 +106,7 @@ def combine_two_stam(stam1: AnnotationStore, stam2: AnnotationStore) -> Annotati
             "value": annotation_data.value().get(),
             "set": data_set_id,
         }
-        stam1.annotate(id=annotation.id(), target=annotation.select(), data=data)
+        stam1.annotate(id=annotation.id(), target=annotation.target(), data=data)
     return stam1
 
 
