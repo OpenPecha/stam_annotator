@@ -1,13 +1,11 @@
 import json
-import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-from github import Github, GithubException
-
 from stam_annotator.config import PECHAS_PATH
 from stam_annotator.exceptions import RepoCloneError, RepoDoesNotExist
-from stam_annotator.stem_fetcher.pecha import Pecha
+from stam_annotator.stam_fetcher.pecha import Pecha
+from stam_annotator.stam_fetcher.utility import check_repo_exists, clone_repo
 
 ORGANIZATION = "PechaData"
 
@@ -47,15 +45,15 @@ class Alignment:
         for id_ in self.segment_pairs:
             yield self.get_segment_pair(id_)
 
-    def get_segment_pair(self, id_) -> List[Tuple[str, str]]:
+    def get_segment_pair(self, id_) -> List[Tuple[str, str, Dict]]:
         segment_pair = []
         for pecha_id, segment_id in self.segment_pairs[id_].items():
             segment_lang = self.segment_source[pecha_id]["lang"]
-            pecha_stam_name = self.segment_source[pecha_id]["base"]
-            segment_text = self.pechas[pecha_id].get_annotation(
-                segment_id, pecha_stam_name
+            pecha_volume_name = self.segment_source[pecha_id]["base"]
+            segment_text, segment_span = self.pechas[pecha_id].get_annotation(
+                segment_id, pecha_volume_name
             )
-            segment_pair.append((segment_text, segment_lang))
+            segment_pair.append((segment_text, segment_lang, segment_span))
         return segment_pair
 
     @classmethod
@@ -81,21 +79,9 @@ class Alignment:
         return cls(id_, github_token, cls.base_path)
 
 
-def check_repo_exists(token, org_name, repo_name):
-    g = Github(token)
-    try:
-        org = g.get_organization(org_name)
-        org.get_repo(repo_name)
-    except GithubException:
-        raise RepoDoesNotExist(org_name, repo_name)
+if __name__ == "__main__":
+    from stam_annotator.github_token import GITHUB_TOKEN
 
-
-def clone_repo(org, repo_name, token, destination_folder: Path):
-    try:
-        """make a inner folder with source org name and clone the repo in it"""
-        repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
-        subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
-        print(f"Repository {repo_name} cloned successfully into {destination_folder}")
-
-    except subprocess.CalledProcessError as e:
-        raise RepoCloneError(org, repo_name, e)
+    alignment = Alignment.from_id("AB3CAED2A", GITHUB_TOKEN)
+    for segment_pair in alignment.get_segment_pairs():
+        print(segment_pair)

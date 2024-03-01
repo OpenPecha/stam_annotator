@@ -1,13 +1,12 @@
 import json
-import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
-from github import Github, GithubException
-from stam import AnnotationStore
+from stam import Annotation, AnnotationStore
 
 from stam_annotator.config import PECHAS_PATH, AnnotationEnum, AnnotationGroupEnum
 from stam_annotator.exceptions import RepoCloneError, RepoDoesNotExist
+from stam_annotator.stam_fetcher.utility import check_repo_exists, clone_repo
 from stam_annotator.utility import get_enum_value_if_match_ignore_case
 
 ORGANIZATION = "PechaData"
@@ -65,11 +64,19 @@ class Pecha:
                 return json.load(file)
         return {}
 
-    def get_annotation(self, id_: str, volume_name) -> str:
+    @staticmethod
+    def get_span_from_annotation(annotation: Annotation) -> Dict:
+        return {
+            "start": annotation.offset().begin().value(),
+            "end": annotation.offset().end().value(),
+        }
+
+    def get_annotation(self, id_: str, volume_name) -> Tuple[str, Dict]:
         """stam returns annotation texts in a list, so we join them"""
-        annotation_text_list = self.pecha_volumes[volume_name].annotation(id_).text()
-        annotation_text = " ".join(annotation_text_list)
-        return annotation_text
+        annotation = self.pecha_volumes[volume_name].annotation(id_)
+        annotation_text = " ".join(annotation.text())
+        annotation_span = self.get_span_from_annotation(annotation)
+        return (annotation_text, annotation_span)
 
     def get_pecha_volume_names(self) -> List:
         return list(self.pecha_volumes.keys())
@@ -93,6 +100,7 @@ class Pecha:
 
             """save annotation data in a dict with annotation id """
             annotation_content["text"] = str(annotation)
+            annotation_content["span"] = self.get_span_from_annotation(annotation)
             if annotation_payloads:
                 annotation_content["payloads"] = annotation_payloads
             annotations_dict[annotation.id()] = annotation_content
@@ -128,26 +136,6 @@ class Pecha:
         return annotations
 
 
-def check_repo_exists(token, org_name, repo_name):
-    g = Github(token)
-    try:
-        org = g.get_organization(org_name)
-        org.get_repo(repo_name)
-    except GithubException:
-        raise RepoDoesNotExist(org_name, repo_name)
-
-
-def clone_repo(org, repo_name, token, destination_folder: Path):
-    try:
-        """make a inner folder with source org name and clone the repo in it"""
-        repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
-        subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
-        print(f"Repository {repo_name} cloned successfully into {destination_folder}")
-
-    except subprocess.CalledProcessError as e:
-        raise RepoCloneError(org, repo_name, e)
-
-
 if __name__ == "__main__":
 
     from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
@@ -155,8 +143,5 @@ if __name__ == "__main__":
 
     pecha_repo = Pecha.from_id("P000216", GITHUB_TOKEN)
     annotations = pecha_repo.get_annotations()
-    annotation_group = AnnotationGroupEnum.structure_type
-    annotation_type = AnnotationEnum.author
-    annotations = pecha_repo.get_filtered_annotations(annotation_group, annotation_type)
     for key, value in annotations.items():
         print(key, value)
