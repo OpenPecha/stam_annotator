@@ -52,17 +52,22 @@ class Pecha:
         cls.base_path = out_path / f"{id_}"
         return cls(id_, cls.base_path)
 
-    def get_meta_data(self):
+    @property
+    def meta_data(self):
         for file_path in self.base_path.rglob("meta.json"):
             with file_path.open() as file:
                 return json.load(file)
         return {}
 
-    def get_index_data(self):
+    @property
+    def index_data(self):
         for file_path in self.base_path.rglob("index.json"):
             with file_path.open() as file:
                 return json.load(file)
         return {}
+
+    def get_base_text(self, volume_name: str) -> str:
+        return self.pecha_volumes[volume_name].resource(volume_name).text()
 
     @staticmethod
     def get_span_from_annotation(annotation: Annotation) -> Dict:
