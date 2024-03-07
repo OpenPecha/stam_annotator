@@ -77,8 +77,8 @@ class Pecha_MD_formatter:
             ann_style = [["Yigchung start", "(<i>)"], ["Yigchung end", "(</i>)"]]
         if ann_type == "Quotation":
             ann_style = [
-                ["Quotation start", r"<blockquote>"],
-                ["Quotation end", r"</blockquote>"],
+                ["Quotation start", "(<blockquote>)"],
+                ["Quotation end", "(</blockquote>)"],
             ]
 
         for annotation in annotations:
