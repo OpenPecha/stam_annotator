@@ -88,9 +88,9 @@ class Pecha_MD_formatter:
             curr_base_text_with_ann = (
                 base_text[:start]
                 + ann_style[0][1]
-                + base_text[start:end]  # noqa
+                + base_text[start : end + 1]  # noqa
                 + ann_style[1][1]
-                + base_text[end:]  # noqa
+                + base_text[end + 1 :]  # noqa
             )
             base_text_with_ann = transfer(
                 curr_base_text_with_ann, ann_style, base_text_with_ann, output="txt"

@@ -73,7 +73,7 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
             id=annotation.annotation_id,
             target=Selector.textselector(
                 store.resource(id=annotation.resource_id),
-                Offset.simple(annotation.span.start, annotation.span.end),
+                Offset.simple(annotation.span.start, annotation.span.end + 1),
             ),
             data=data,
         )
