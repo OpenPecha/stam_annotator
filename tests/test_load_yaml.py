@@ -1,11 +1,13 @@
 from pathlib import Path
 
+from config import data_folder
+
 from stam_annotator.utility import load_opf_annotations_from_yaml
 
 
 def test_load_opf_annotations_from_yaml():
     # opf_author.yml has only one annotation
-    yaml_file_path = Path(__file__).parent.absolute() / "data" / "opf_author.yml"
+    yaml_file_path = data_folder / "opf_author.yml"
     yaml_annotations = load_opf_annotations_from_yaml(yaml_file_path)
     assert yaml_annotations["id"] == "5a54033501934d03bf5b8543542d9d6d"
     assert yaml_annotations["annotation_type"] == "Author"

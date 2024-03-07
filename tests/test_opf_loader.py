@@ -1,12 +1,14 @@
 from pathlib import Path
 
+from config import data_folder
+
 from stam_annotator.opf_loader import create_opf_annotation_instance
 from stam_annotator.utility import load_opf_annotations_from_yaml
 
 
 def test_create_annotation_loader():
     # opf_author.yml has only one annotation
-    yaml_file_path = Path(__file__).parent.absolute() / "data" / "opf_author.yml"
+    yaml_file_path = data_folder / "opf_author.yml"
     yaml_content = load_opf_annotations_from_yaml(yaml_file_path)
 
     annotation_doc = create_opf_annotation_instance(yaml_content)
