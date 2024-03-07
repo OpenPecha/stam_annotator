@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from antx import transfer
 
-from stam_annotator.config import PECHAS_PATH
+from stam_annotator.config import PECHAS_PATH, AnnotationEnum
 from stam_annotator.stam_fetcher.pecha import Pecha
 
 
@@ -65,17 +65,17 @@ class Pecha_MD_formatter:
     def apply_annotation(
         base_text_with_ann: str, base_text: str, ann_type: str, annotations: List[Dict]
     ) -> str:
-        if ann_type == "BookTitle":
+        if ann_type == AnnotationEnum.book_title.value:
             ann_style = [["BookTitle start", "(<h1>)"], ["BookTitle end", "(</h1>)"]]
-        if ann_type == "Chapter":
+        if ann_type == AnnotationEnum.chapter.value:
             ann_style = [["Chapter start", "(<h2>)"], ["Chapter end", "(</h2>)"]]
-        if ann_type == "Sabche":
+        if ann_type == AnnotationEnum.sabche.value:
             ann_style = [["Sabche start", "(<h3>)"], ["Sabche end", "(</h3>)"]]
-        if ann_type == "Author":
+        if ann_type == AnnotationEnum.author.value:
             ann_style = [["Author start", "(<i>—)"], ["Author end", "(—</i>)"]]
-        if ann_type == "Yigchung":
+        if ann_type == AnnotationEnum.yigchung.value:
             ann_style = [["Yigchung start", "(<i>)"], ["Yigchung end", "(</i>)"]]
-        if ann_type == "Quotation":
+        if ann_type == AnnotationEnum.quotation.value:
             ann_style = [
                 ["Quotation start", "(<blockquote>)"],
                 ["Quotation end", "(</blockquote>)"],
