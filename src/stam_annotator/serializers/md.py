@@ -60,34 +60,36 @@ class Pecha_MD_formatter:
     @staticmethod
     def apply_annotation(base_text: str, ann_type: str, annotations: List[Dict]) -> str:
         if ann_type == "BookTitle":
-            ann_style = [["BookTitle start", r"<h1>"], ["BookTitle end", r"</h1>"]]
+            ann_style = [["BookTitle start", "(<h1>)"], ["BookTitle end", "(</h1>)"]]
         if ann_type == "Chapter":
-            ann_style = [["Chapter start", r"<h2>"], ["Chapter end", r"</h2>"]]
+            ann_style = [["Chapter start", "(<h2>)"], ["Chapter end", "(</h2>)"]]
         if ann_type == "Sabche":
-            ann_style = [["Sabche start", r"<h3>"], ["Sabche end", r"</h3>"]]
+            ann_style = [["Sabche start", "(<h3>)"], ["Sabche end", "(</h3>)"]]
         if ann_type == "Author":
-            ann_style = [["Author start", r"<i>—"], ["Author end", r"—</i>"]]
+            ann_style = [["Author start", "(<i>—)"], ["Author end", "(—</i>)"]]
         if ann_type == "Yigchung":
-            ann_style = [["Yigchung start", r"<i>"], ["Yigchung end", r"</i>"]]
+            ann_style = [["Yigchung start", "(<i>)"], ["Yigchung end", "(</i>)"]]
         if ann_type == "Quotation":
             ann_style = [
                 ["Quotation start", r"<blockquote>"],
                 ["Quotation end", r"</blockquote>"],
             ]
 
+        base_text_backup = base_text
         for annotation in annotations:
             start, end = annotation["span"]["start"], annotation["span"]["end"]
+            if start >= end:
+                continue
             base_text_with_annotation = (
-                base_text[:start]
+                base_text_backup[:start]
                 + ann_style[0][1]
-                + base_text[start:end]
+                + base_text_backup[start : end + 1]  # noqa
                 + ann_style[1][1]
-                + base_text[end:]
+                + base_text_backup[end + 1 :]  # noqa
             )
-            result = transfer(
+            base_text = transfer(
                 base_text_with_annotation, ann_style, base_text, output="txt"
             )
-            base_text = result
 
         return base_text
 
