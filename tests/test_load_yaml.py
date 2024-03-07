@@ -23,10 +23,10 @@ def test_load_opf_annotations_from_yaml():
     assert yaml_annotations["annotation_type"] == "Quotation"
     assert yaml_annotations["revision"] == "00001"
     assert yaml_annotations["annotations"]["a1f3e26bdb08449aaece0bba4ac4f5cc"] == {
-        "span": {"start": 16302, "end": 16302}
+        "span": {"start": 16302, "end": 16330}
     }
     assert yaml_annotations["annotations"]["670003b927a54a5aad937c6ae0206e61"] == {
-        "span": {"start": 16444, "end": 16444}
+        "span": {"start": 16444, "end": 16450}
     }
 
 

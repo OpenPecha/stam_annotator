@@ -33,11 +33,11 @@ def test_create_annotation_loader():
         if uuid == "a1f3e26bdb08449aaece0bba4ac4f5cc":
             start, end = annotation.span.start, annotation.span.end
             assert start == 16302
-            assert end == 16302
+            assert end == 16330
         if uuid == "670003b927a54a5aad937c6ae0206e61":
             start, end = annotation.span.start, annotation.span.end
             assert start == 16444
-            assert end == 16444
+            assert end == 16450
 
 
 if __name__ == "__main__":
