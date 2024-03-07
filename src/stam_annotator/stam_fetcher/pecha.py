@@ -147,6 +147,7 @@ if __name__ == "__main__":
     from stam_annotator.github_token import GITHUB_TOKEN
 
     pecha_repo = Pecha.from_id("P000216", GITHUB_TOKEN)
-    annotations = pecha_repo.get_annotations()
+    annotations = pecha_repo.get_annotations()["v001"]
+
     for key, value in annotations.items():
-        print(key, value)
+        print(value)

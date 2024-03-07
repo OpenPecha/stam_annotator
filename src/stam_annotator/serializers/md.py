@@ -49,16 +49,22 @@ class Pecha_MD_formatter:
             self.serialize_volume(volume_name, output_dir)
 
     def serialize_volume(self, volume_name: str, output_dir: Path):
-        base_text = self.base_texts[volume_name]
+        base_text_backup = self.base_texts[volume_name]
+        base_text_with_ann = base_text_backup
         volume_annotations = self.grouped_annotations[volume_name]
+
         for annotation_type, annotations in volume_annotations.items():
-            base_text = self.apply_annotation(base_text, annotation_type, annotations)
+            base_text_with_ann = self.apply_annotation(
+                base_text_with_ann, base_text_backup, annotation_type, annotations
+            )
 
         output_md_file = output_dir / f"{self.pecha_id}_{volume_name}.md"
-        output_md_file.write_text(base_text)
+        output_md_file.write_text(base_text_with_ann)
 
     @staticmethod
-    def apply_annotation(base_text: str, ann_type: str, annotations: List[Dict]) -> str:
+    def apply_annotation(
+        base_text_with_ann: str, base_text: str, ann_type: str, annotations: List[Dict]
+    ) -> str:
         if ann_type == "BookTitle":
             ann_style = [["BookTitle start", "(<h1>)"], ["BookTitle end", "(</h1>)"]]
         if ann_type == "Chapter":
@@ -75,23 +81,22 @@ class Pecha_MD_formatter:
                 ["Quotation end", r"</blockquote>"],
             ]
 
-        base_text_backup = base_text
         for annotation in annotations:
             start, end = annotation["span"]["start"], annotation["span"]["end"]
             if start >= end:
                 continue
-            base_text_with_annotation = (
-                base_text_backup[:start]
+            curr_base_text_with_ann = (
+                base_text[:start]
                 + ann_style[0][1]
-                + base_text_backup[start : end + 1]  # noqa
+                + base_text[start:end]  # noqa
                 + ann_style[1][1]
-                + base_text_backup[end + 1 :]  # noqa
+                + base_text[end:]  # noqa
             )
-            base_text = transfer(
-                base_text_with_annotation, ann_style, base_text, output="txt"
+            base_text_with_ann = transfer(
+                curr_base_text_with_ann, ann_style, base_text_with_ann, output="txt"
             )
 
-        return base_text
+        return base_text_with_ann
 
 
 if __name__ == "__main__":
