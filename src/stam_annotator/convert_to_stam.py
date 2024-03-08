@@ -32,7 +32,7 @@ class PechaRepo:
 
     @property
     def pecha_repo_fn(self):
-        return self.base_path / f"{self.source_org}"
+        return self.base_path / f"{self.destination_org}"
 
     @classmethod
     def from_id(cls, id_: str) -> "PechaRepo":
@@ -40,7 +40,7 @@ class PechaRepo:
         return PechaRepo(id_, cls.base_path)
 
     def get_pecha_repo(self):
-        destination_folder = self.base_path / self.source_org
+        destination_folder = self.base_path / self.source_org / self.pecha_id
         if destination_folder.exists() and list(destination_folder.rglob("*")):
             print(
                 f"Destination folder {destination_folder} already exists and is not empty."
@@ -52,7 +52,7 @@ class PechaRepo:
 
                 repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
                 subprocess.run(
-                    ["git", "clone", repo_url, destination_folder], check=True
+                    ["git", "clone", repo_url, str(destination_folder)], check=True
                 )
                 print(
                     f"Repository {repo_name} cloned successfully into {destination_folder}"
@@ -64,7 +64,7 @@ class PechaRepo:
     def convert_pecha_repo_to_stam(self):
         group_files = get_folder_structure(self.base_path / self.source_org)
         group_files = sort_dict_by_path_strings(group_files)
-        make_local_folder(self.base_path / self.destination_org)
+        make_local_folder(self.base_path / self.destination_org / self.pecha_id)
         for parent_dir, documents in group_files.items():
             new_parent_dir = replace_parent_folder_name(
                 parent_dir, self.source_org, self.destination_org
@@ -108,7 +108,9 @@ class PechaRepo:
             )
 
             save_annotation_store(
-                combined_stam, new_parent_dir / f"{parent_dir.name}.opf.json"
+                combined_stam,
+                new_parent_dir / f"{parent_dir.name}.opf.json",
+                self.base_path / self.destination_org,
             )
         print(f"Pecha repo {self.pecha_id} converted to stam successfully")
 
@@ -280,12 +282,12 @@ def get_folder_structure(path: Path):
     return grouped_files
 
 
-def replace_parent_folder_name(path: Path, old_name: str, new_name: str):
+def replace_parent_folder_name(path: Path, old_name: str, new_name: str) -> Path:
     """Replace the parent folder name of the path with the new name"""
 
     parts = path.parts
     layers_dir = "layers"
-    """if there are folders presented in layers dir, then the path is trimmed"""
+    """if there are folders(volume name) presented in layers dir, then the path is trimmed"""
     if layers_dir in parts:
         index = parts.index(layers_dir)
         trimmed_path = Path(*parts[: index + 1])
