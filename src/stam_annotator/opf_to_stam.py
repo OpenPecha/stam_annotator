@@ -23,8 +23,8 @@ def create_annotationstore(id: str):
     return AnnotationStore(id=id)
 
 
-def create_resource(store: AnnotationStore, resource_id: str, text: str):
-    return store.add_resource(id=resource_id, text=text)
+def create_resource(store: AnnotationStore, resource_file_path: str):
+    return store.add_resource(filename=str(resource_file_path))
 
 
 def create_dataset(store: AnnotationStore, id: str, key: AnnotationGroupEnum):
@@ -45,9 +45,7 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
     # Create resource
 
     for resource in annotation_store.resources:
-        create_resource(
-            store=store, resource_id=resource.resource_id, text=resource.text
-        )
+        create_resource(store=store, resource_file_path=resource.resource_id)
     # Create dataset
     data_set = annotation_store.datasets[0]
     dataset = create_dataset(

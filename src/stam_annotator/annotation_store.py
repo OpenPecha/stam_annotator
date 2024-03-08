@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
 from stam_annotator.opf_loader import OpfAnnotation, Span
-from stam_annotator.utility import get_filename_without_extension, get_uuid
+from stam_annotator.utility import get_uuid
 
 
 class Annotation_Data(BaseModel):
@@ -18,7 +18,6 @@ class Annotation_Data(BaseModel):
 
 class Resource(BaseModel):
     resource_id: str
-    text: str
 
 
 class Annotation(BaseModel):
@@ -76,9 +75,7 @@ class Annotation_Store(BaseModel):
 
 
 def create_resource(file_path: Union[str, Path]):
-    resource_id = get_filename_without_extension(file_path)
-    text = Path(file_path).read_text(encoding="utf-8")
-    return Resource(resource_id=resource_id, text=text)
+    return Resource(resource_id=str(file_path))
 
 
 def create_data_set(data_set_id: str, data_set_key: AnnotationGroupEnum):
