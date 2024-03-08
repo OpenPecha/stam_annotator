@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 from pathlib import Path
 from typing import Dict, Union
 from uuid import uuid4
@@ -21,6 +22,12 @@ def is_json_file_path(file_path: Path) -> bool:
 
 def get_uuid():
     return uuid4().hex
+
+
+def sort_dict_by_path_strings(input_dict):
+    sorted_keys = sorted(input_dict.keys(), key=lambda x: str(x))
+    sorted_dict = OrderedDict((key, input_dict[key]) for key in sorted_keys)
+    return sorted_dict
 
 
 def read_json_to_dict(file_path: Path) -> Dict:

@@ -13,7 +13,7 @@ from stam_annotator.config import ROOT_DIR, AnnotationGroupEnum
 from stam_annotator.github_token import GITHUB_TOKEN
 from stam_annotator.opf_to_stam import opf_to_stam_pipeline
 from stam_annotator.stam_manager import combine_stams
-from stam_annotator.utility import save_annotation_store
+from stam_annotator.utility import save_annotation_store, sort_dict_by_path_strings
 
 SOURCE_ORG = "OpenPecha-Data"
 DESTINATION_ORG = "PechaData"
@@ -55,6 +55,7 @@ class PechaRepo:
 
     def convert_pecha_repo_to_stam(self):
         group_files = get_folder_structure(self.base_path / self.source_org)
+        group_files = sort_dict_by_path_strings(group_files)
         make_local_folder(self.base_path / self.destination_org)
         for parent_dir, documents in group_files.items():
             new_parent_dir = replace_parent_folder_name(
