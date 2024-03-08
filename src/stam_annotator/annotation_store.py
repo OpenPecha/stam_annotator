@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -17,7 +17,8 @@ class Annotation_Data(BaseModel):
 
 
 class Resource(BaseModel):
-    resource_id: str
+    id_: str
+    file_path: Path
 
 
 class Annotation(BaseModel):
@@ -74,8 +75,8 @@ class Annotation_Store(BaseModel):
         self.annotations.append(annotation)
 
 
-def create_resource(file_path: Union[str, Path]):
-    return Resource(resource_id=str(file_path))
+def create_resource(file_path: Path):
+    return Resource(id_=file_path.name, file_path=file_path)
 
 
 def create_data_set(data_set_id: str, data_set_key: AnnotationGroupEnum):
@@ -108,7 +109,7 @@ def add_annotation_data_to_data_set(
 def convert_opf_for_pre_stam_format(
     opf_annot: OpfAnnotation,
     annotation_type_key: AnnotationGroupEnum,
-    resource_file_path: Union[str, Path],
+    resource_file_path: Path,
 ) -> Annotation_Store:
     """
     Convert opf annotation to annotation store for pre-stam format.
@@ -137,7 +138,7 @@ def convert_opf_for_pre_stam_format(
             annotation_id=id,
             span=annotation.span,
             annotation_data=annotation_data,
-            resource_id=resource.resource_id,
+            resource_id=resource.id_,
             payloads=annotation.payloads,
         )
         annotation_store.add_annotation(annotation)

@@ -110,7 +110,7 @@ class PechaRepo:
             save_annotation_store(
                 combined_stam,
                 new_parent_dir / f"{parent_dir.name}.opf.json",
-                self.base_path / self.destination_org,
+                self.base_path / self.destination_org / self.pecha_id,
             )
         print(f"Pecha repo {self.pecha_id} converted to stam successfully")
 
@@ -118,7 +118,7 @@ class PechaRepo:
         org_name, repo_name = DESTINATION_ORG, self.pecha_id
         repo_is_created = create_github_repo(org_name, repo_name, GITHUB_TOKEN)
         if repo_is_created:
-            project_path = self.base_path / self.destination_org
+            project_path = self.base_path / self.destination_org / self.pecha_id
             repo_name = self.pecha_id
             upload_files_to_github_repo(org_name, repo_name, project_path, GITHUB_TOKEN)
             print(f"Pecha repo {repo_name} uploaded successfully")
@@ -318,3 +318,4 @@ if __name__ == "__main__":
     pecha_repo = PechaRepo.from_id("P000216")
     pecha_repo.get_pecha_repo()
     pecha_repo.convert_pecha_repo_to_stam()
+    pecha_repo.upload_pecha_repo()

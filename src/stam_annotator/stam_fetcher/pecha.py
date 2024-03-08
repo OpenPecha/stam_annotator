@@ -6,7 +6,11 @@ from stam import Annotation, AnnotationStore
 
 from stam_annotator.config import PECHAS_PATH, AnnotationEnum, AnnotationGroupEnum
 from stam_annotator.exceptions import RepoCloneError, RepoDoesNotExist
-from stam_annotator.stam_fetcher.utility import check_repo_exists, clone_repo
+from stam_annotator.stam_fetcher.utility import (
+    add_base_path_to_stam_annotation_files,
+    check_repo_exists,
+    clone_repo,
+)
 from stam_annotator.utility import get_enum_value_if_match_ignore_case
 
 ORGANIZATION = "PechaData"
@@ -50,6 +54,7 @@ class Pecha:
                 return None
 
         cls.base_path = out_path / f"{id_}"
+        add_base_path_to_stam_annotation_files(cls.base_path)
         return cls(id_, cls.base_path)
 
     @property
