@@ -40,18 +40,26 @@ class PechaRepo:
         return PechaRepo(id_, cls.base_path)
 
     def get_pecha_repo(self):
-        try:
-            org, repo_name, token = self.source_org, self.pecha_id, GITHUB_TOKEN
-            """make a inner folder with source org name and clone the repo in it"""
-            destination_folder = self.base_path / org
-            repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
-            subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
+        destination_folder = self.base_path / self.source_org
+        if destination_folder.exists() and list(destination_folder.rglob("*")):
             print(
-                f"Repository {repo_name} cloned successfully into {destination_folder}"
+                f"Destination folder {destination_folder} already exists and is not empty."
             )
+        else:
+            try:
+                org, repo_name, token = self.source_org, self.pecha_id, GITHUB_TOKEN
+                """make a inner folder with source org name and clone the repo in it"""
 
-        except subprocess.CalledProcessError as e:
-            print(f"Error cloning {repo_name} repository: {e}")
+                repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
+                subprocess.run(
+                    ["git", "clone", repo_url, destination_folder], check=True
+                )
+                print(
+                    f"Repository {repo_name} cloned successfully into {destination_folder}"
+                )
+
+            except subprocess.CalledProcessError as e:
+                print(f"Error cloning {repo_name} repository: {e}")
 
     def convert_pecha_repo_to_stam(self):
         group_files = get_folder_structure(self.base_path / self.source_org)
@@ -102,6 +110,7 @@ class PechaRepo:
             save_annotation_store(
                 combined_stam, new_parent_dir / f"{parent_dir.name}.opf.json"
             )
+        print(f"Pecha repo {self.pecha_id} converted to stam successfully")
 
     def upload_pecha_repo(self):
         org_name, repo_name = DESTINATION_ORG, self.pecha_id
