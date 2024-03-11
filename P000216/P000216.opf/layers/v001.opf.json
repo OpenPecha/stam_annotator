@@ -5,7 +5,7 @@
     {
       "@type": "TextResource",
       "@id": "v001.txt",
-      "@include": "/home/tenzin3/stam_annotator/tests/serializer/data/P000216/P000216.opf/base/v001.txt"
+      "@include": "/home/tenzin3/stam_annotator/P000216/P000216.opf/base/v001.txt"
     }
   ],
   "annotationsets": [

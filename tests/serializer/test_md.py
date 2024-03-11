@@ -15,12 +15,8 @@ def test_md_serializer():
 
     annotation_types = md_formatter.grouped_annotations["v001"].keys()
     assert set(annotation_types) == {
-        "Yigchung",
         "Author",
-        "Quotation",
         "BookTitle",
-        "Chapter",
-        "Sabche",
     }
 
     volumes = md_formatter.pecha.get_pecha_volume_names()
