@@ -1,6 +1,5 @@
 import json
 import shutil
-import subprocess
 from pathlib import Path
 from typing import Dict
 
@@ -9,6 +8,7 @@ from stam_annotator.github_token import GITHUB_TOKEN
 from stam_annotator.stam_manager import combine_stams
 from stam_annotator.to_stam_convertor.opf_to_stam import opf_to_stam_pipeline
 from stam_annotator.to_stam_convertor.utility import (
+    clone_github_repo,
     convert_yml_file_to_json,
     create_folder_if_not_exists,
     create_github_repo,
@@ -45,25 +45,9 @@ class PechaRepo:
 
     def get_pecha_repo(self):
         destination_folder = self.base_path / self.source_org / self.pecha_id
-        if destination_folder.exists() and list(destination_folder.rglob("*")):
-            print(
-                f"Destination folder {destination_folder} already exists and is not empty."
-            )
-        else:
-            try:
-                org, repo_name, token = self.source_org, self.pecha_id, GITHUB_TOKEN
-                """make a inner folder with source org name and clone the repo in it"""
-
-                repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
-                subprocess.run(
-                    ["git", "clone", repo_url, str(destination_folder)], check=True
-                )
-                print(
-                    f"Repository {repo_name} cloned successfully into {destination_folder}"
-                )
-
-            except subprocess.CalledProcessError as e:
-                print(f"Error cloning {repo_name} repository: {e}")
+        clone_github_repo(
+            self.source_org, self.pecha_id, destination_folder, GITHUB_TOKEN
+        )
 
     def convert_pecha_repo_to_stam(self):
         group_files = get_folder_structure(self.base_path / self.source_org)
@@ -163,18 +147,10 @@ class AlignmentRepo:
             self.pecha_repos[pecha_id] = PechaRepo.from_id(pecha_id)
 
     def get_alignment_repo(self):
-        try:
-            org, repo_name, token = self.source_org, self.alignment_id, GITHUB_TOKEN
-            """make a inner folder with source org name and clone the repo in it"""
-            destination_folder = self.base_path / org
-            repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
-            subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
-            print(
-                f"Repository {repo_name} cloned successfully into {destination_folder}"
-            )
-
-        except subprocess.CalledProcessError as e:
-            print(f"Error cloning {repo_name} repository: {e}")
+        destination_folder = self.base_path / self.source_org
+        clone_github_repo(
+            self.source_org, self.alignment_id, destination_folder, GITHUB_TOKEN
+        )
 
     def convert_alignment_repo_to_json(self):
         group_files = get_folder_structure(self.base_path / self.source_org)
@@ -222,6 +198,7 @@ class AlignmentRepo:
 
 
 if __name__ == "__main__":
-    alignment = AlignmentRepo.from_id("P000216")
+    alignment = AlignmentRepo.from_id("AB3CAED2A")
     alignment.get_alignment_repo()
     alignment.convert_alignment_repo_to_json()
+    alignment.get_aligned_pechas()

@@ -1,4 +1,5 @@
 import json
+import subprocess
 from datetime import datetime
 from json import JSONEncoder
 from pathlib import Path
@@ -18,6 +19,29 @@ def create_folder_if_not_exists(folder_path):
     path = Path(folder_path)
     if not path.exists():
         path.mkdir(parents=True, exist_ok=True)
+
+
+def clone_github_repo(
+    org_name: str, repo_name: str, destination_folder: Path, token: str
+):
+    if destination_folder.exists() and list(destination_folder.rglob("*")):
+        print(
+            f"[INFO]: Destination folder {destination_folder} already exists and is not empty."
+        )
+    else:
+        try:
+            repo_url = f"https://{token}@github.com/{org_name}/{repo_name}.git"
+            subprocess.run(
+                ["git", "clone", repo_url, str(destination_folder)],
+                check=True,
+                capture_output=True,
+            )
+            print(
+                f"[INFO]: Repository {repo_name} cloned successfully into {destination_folder}"
+            )
+
+        except subprocess.CalledProcessError as e:
+            print(f"[ERROR]: Error cloning {repo_name} repository: {e}")
 
 
 def create_github_repo(org_name: str, repo_name: str, token: str) -> bool:
