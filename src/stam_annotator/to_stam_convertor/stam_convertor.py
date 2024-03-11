@@ -8,16 +8,18 @@ from stam_annotator.github_token import GITHUB_TOKEN
 from stam_annotator.stam_manager import combine_stams
 from stam_annotator.to_stam_convertor.opf_to_stam import opf_to_stam_pipeline
 from stam_annotator.to_stam_convertor.utility import (
-    clone_github_repo,
     convert_yml_file_to_json,
-    create_folder_if_not_exists,
     create_github_repo,
     get_folder_structure,
     make_local_folder,
     replace_parent_folder_name,
     upload_files_to_github_repo,
 )
-from stam_annotator.utility import save_annotation_store, sort_dict_by_path_strings
+from stam_annotator.utility import (
+    clone_github_repo,
+    save_annotation_store,
+    sort_dict_by_path_strings,
+)
 
 SOURCE_ORG = "OpenPecha-Data"
 DESTINATION_ORG = "PechaData"
@@ -63,7 +65,7 @@ class PechaRepo:
             for doc, tag in documents:
                 if tag == "folder":
                     continue
-                create_folder_if_not_exists(new_parent_dir)
+                new_parent_dir.mkdir(parents=True, exist_ok=True)
                 if not doc.endswith(".yml"):
                     shutil.copy(parent_dir / doc, new_parent_dir / doc)
                     continue

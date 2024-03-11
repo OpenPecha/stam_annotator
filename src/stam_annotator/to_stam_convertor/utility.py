@@ -1,43 +1,18 @@
 import json
-import subprocess
 from datetime import datetime
 from json import JSONEncoder
 from pathlib import Path
 from typing import Dict, List, Union
 
+import stam
 import yaml
 from github import Github, GithubException
+from stam import Annotations
 
 
-def create_folder_if_not_exists(folder_path):
-    """
-    Create a folder at the given path if it does not exist.
-    This also creates any necessary parent folders.
-
-    :param folder_path: Path of the folder to be created.
-    """
-    path = Path(folder_path)
-    if not path.exists():
-        path.mkdir(parents=True, exist_ok=True)
-
-
-def clone_github_repo(
-    org_name: str, repo_name: str, destination_folder: Path, token: str
-):
-    if destination_folder.exists() and list(destination_folder.rglob("*")):
-        print(f"[INFO]: Repo {repo_name} already exists. Skipping cloning...")
-    else:
-        try:
-            repo_url = f"https://{token}@github.com/{org_name}/{repo_name}.git"
-            subprocess.run(
-                ["git", "clone", repo_url, str(destination_folder)],
-                check=True,
-                capture_output=True,
-            )
-            print(f"[SUCCESS]: Repository {repo_name} cloned successfully.")
-
-        except subprocess.CalledProcessError as e:
-            print(f"[ERROR]: Error cloning {repo_name} repository: {e}")
+def make_local_folder(destination_folder: Path) -> Path:
+    destination_folder.mkdir(parents=True, exist_ok=True)
+    return destination_folder
 
 
 def create_github_repo(org_name: str, repo_name: str, token: str) -> bool:
@@ -92,12 +67,6 @@ def upload_files_to_github_repo(
                 print(f"[ERROR]: Uploading file to github {relative_file_path}: {e}")
 
 
-def make_local_folder(destination_folder: Path) -> Path:
-    """make local folder to clone the alignment and pecha repo"""
-    destination_folder.mkdir(parents=True, exist_ok=True)
-    return destination_folder
-
-
 def get_folder_structure(path: Path):
     base_path = Path(path)
     grouped_files: Dict[Path, List] = {}
@@ -144,3 +113,32 @@ class CustomEncoder(JSONEncoder):
             return obj.strftime("%Y-%m-%d %H:%M:%S")
         # Let the base class default method raise the TypeError
         return JSONEncoder.default(self, obj)
+
+
+def convert_opf_stam_annotation_to_dictionary(
+    annotations: Annotations, include_payload: bool = True
+) -> Dict:
+    """
+    This function converts the annotation object to a dictionary.
+    """
+    annotation_dict = {}
+    for annotation in annotations:
+        # get the text to which this annotation refers (if any)
+        text = str(annotation) if not isinstance(annotation, stam.StamError) else "n/a"
+        for data in annotation:
+            annotation_dict[annotation.id()] = {
+                "id": annotation.id(),
+                "key": data.key().id(),
+                "value": str(data.value()),
+                "text": text,
+            }
+            if include_payload:
+                payload_dictionary = {}
+                for annot in annotation.annotations():
+                    for data in annot:
+                        payload_dictionary[data.key().id()] = {
+                            "id": annot.id(),
+                            "value": str(data.value()),
+                        }
+                annotation_dict[annotation.id()]["payload"] = payload_dictionary
+    return annotation_dict

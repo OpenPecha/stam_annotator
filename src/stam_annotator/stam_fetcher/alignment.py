@@ -3,9 +3,8 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 from stam_annotator.config import PECHAS_PATH
-from stam_annotator.exceptions import RepoCloneError, RepoDoesNotExist
 from stam_annotator.stam_fetcher.pecha import Pecha
-from stam_annotator.stam_fetcher.utility import check_repo_exists, clone_repo
+from stam_annotator.utility import clone_github_repo
 
 ORGANIZATION = "PechaData"
 
@@ -59,21 +58,7 @@ class Alignment:
     @classmethod
     def from_id(cls, id_: str, github_token: str, out_path: Path = PECHAS_PATH):
         """load if alignment exits"""
-        if not (out_path / f"{id_}").exists():
-            try:
-                check_repo_exists(github_token, ORGANIZATION, repo_name=id_)
-                clone_repo(
-                    ORGANIZATION,
-                    id_,
-                    github_token,
-                    destination_folder=out_path / f"{id_}",
-                )
-            except RepoDoesNotExist as error:
-                print(f"[ERROR]: Alignment {error.message}")
-                return None
-            except RepoCloneError as error:
-                print(f"[ERROR]: Alignment {error.message}")
-                return None
+        clone_github_repo(ORGANIZATION, id_, out_path, github_token)
 
         cls.base_path = out_path / f"{id_}"
         return cls(id_, github_token, cls.base_path)
