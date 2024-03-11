@@ -3,10 +3,10 @@ import subprocess
 from datetime import datetime
 from json import JSONEncoder
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import yaml
-from github import Github
+from github import Github, GithubException
 
 
 def create_folder_if_not_exists(folder_path):
@@ -25,9 +25,7 @@ def clone_github_repo(
     org_name: str, repo_name: str, destination_folder: Path, token: str
 ):
     if destination_folder.exists() and list(destination_folder.rglob("*")):
-        print(
-            f"[INFO]: Destination folder {destination_folder} already exists and is not empty."
-        )
+        print(f"[INFO]: Repo {repo_name} already exists. Skipping cloning...")
     else:
         try:
             repo_url = f"https://{token}@github.com/{org_name}/{repo_name}.git"
@@ -36,9 +34,7 @@ def clone_github_repo(
                 check=True,
                 capture_output=True,
             )
-            print(
-                f"[INFO]: Repository {repo_name} cloned successfully into {destination_folder}"
-            )
+            print(f"[SUCCESS]: Repository {repo_name} cloned successfully.")
 
         except subprocess.CalledProcessError as e:
             print(f"[ERROR]: Error cloning {repo_name} repository: {e}")
@@ -61,7 +57,7 @@ def upload_files_to_github_repo(
     repo_name: str,
     project_path: Path,
     token: str,
-    commit_message: str = "upload file",
+    commit_message: Union[str, None] = None,
 ):
     g = Github(token)
     repo = g.get_organization(org_name).get_repo(repo_name)
@@ -72,7 +68,28 @@ def upload_files_to_github_repo(
             data = f.read()
         """upload file to github repo """
         relative_file_path = file.relative_to(project_path)
-        repo.create_file(str(relative_file_path), commit_message, data, branch="main")
+
+        try:
+            contents = repo.get_contents(str(relative_file_path), ref="main")
+            # If file exists, update it
+            file_commit_message = (
+                commit_message if commit_message else f"Update {file.name}"
+            )
+            repo.update_file(
+                contents.path, file_commit_message, data, contents.sha, branch="main"
+            )
+        except GithubException as e:
+            if e.status == 404:
+                # If file does not exist, create it
+                file_commit_message = (
+                    commit_message if commit_message else f"Create {file.name}"
+                )
+                repo.create_file(
+                    str(relative_file_path), file_commit_message, data, branch="main"
+                )
+            else:
+                # Handle other exceptions
+                print(f"[ERROR]: Uploading file to github {relative_file_path}: {e}")
 
 
 def make_local_folder(destination_folder: Path) -> Path:

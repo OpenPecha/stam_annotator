@@ -104,12 +104,11 @@ class PechaRepo:
 
     def upload_pecha_repo(self):
         org_name, repo_name = DESTINATION_ORG, self.pecha_id
-        repo_is_created = create_github_repo(org_name, repo_name, GITHUB_TOKEN)
-        if repo_is_created:
-            project_path = self.base_path / self.destination_org / self.pecha_id
-            repo_name = self.pecha_id
-            upload_files_to_github_repo(org_name, repo_name, project_path, GITHUB_TOKEN)
-            print(f"[SUCCESS]: Pecha repo {repo_name} uploaded successfully")
+        create_github_repo(org_name, repo_name, GITHUB_TOKEN)
+        pecha_repo_path = self.base_path / self.destination_org / self.pecha_id
+        repo_name = self.pecha_id
+        upload_files_to_github_repo(org_name, repo_name, pecha_repo_path, GITHUB_TOKEN)
+        print(f"[SUCCESS]: Pecha repo {repo_name} uploaded successfully")
 
 
 class AlignmentRepo:
@@ -179,12 +178,14 @@ class AlignmentRepo:
 
     def upload_alignment_repo(self):
         org_name, repo_name = DESTINATION_ORG, self.alignment_id
-        repo_is_created = create_github_repo(org_name, repo_name, GITHUB_TOKEN)
-        if repo_is_created:
-            project_path = self.base_path / self.destination_org
-            repo_name = self.alignment_id
-            upload_files_to_github_repo(org_name, repo_name, project_path, GITHUB_TOKEN)
-            print(f"[SUCCESS]: Alignment repo {repo_name} uploaded successfully")
+        create_github_repo(org_name, repo_name, GITHUB_TOKEN)
+
+        alignment_repo_path = self.base_path / self.destination_org
+        repo_name = self.alignment_id
+        upload_files_to_github_repo(
+            org_name, repo_name, alignment_repo_path, GITHUB_TOKEN
+        )
+        print(f"[SUCCESS]: Alignment repo {repo_name} uploaded successfully")
 
     def get_aligned_pechas(self):
         self.load_pecha_repos()
@@ -202,3 +203,5 @@ if __name__ == "__main__":
     alignment.get_alignment_repo()
     alignment.convert_alignment_repo_to_json()
     alignment.get_aligned_pechas()
+    alignment.upload_alignment_repo()
+    alignment.upload_aligned_pechas()
