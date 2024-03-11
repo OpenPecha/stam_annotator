@@ -100,10 +100,10 @@ class Pecha_MD_formatter:
 
 
 if __name__ == "__main__":
-    from stam_annotator.github_token import GITHUB_TOKEN
 
     pecha_id = "P000216"
-    formatter = Pecha_MD_formatter.from_id(pecha_id, GITHUB_TOKEN)
+    pecha = Pecha(pecha_id, Path("/home/tenzin3/stam_annotator/P000216"))
+    formatter = Pecha_MD_formatter(pecha)
 
     output_dir = Path(".")
     formatter.serialize(output_dir)

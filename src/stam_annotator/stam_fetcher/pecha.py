@@ -21,6 +21,7 @@ class Pecha:
         self.id_ = id_
         self.base_path = base_path
         self.pecha_volumes: Dict[str, AnnotationStore] = {}
+        add_base_path_to_stam_annotation_files(self.base_path)
         self.load_pecha()
 
     @property
@@ -54,7 +55,6 @@ class Pecha:
                 return None
 
         cls.base_path = out_path / f"{id_}"
-        add_base_path_to_stam_annotation_files(cls.base_path)
         return cls(id_, cls.base_path)
 
     @property
@@ -72,7 +72,8 @@ class Pecha:
         return {}
 
     def get_base_text(self, volume_name: str) -> str:
-        return self.pecha_volumes[volume_name].resource(volume_name).text()
+        resource = list(self.base_path.rglob(f"{volume_name}.txt"))[0]
+        return resource.read_text()
 
     @staticmethod
     def get_span_from_annotation(annotation: Annotation) -> Dict:
