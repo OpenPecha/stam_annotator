@@ -50,7 +50,7 @@ def get_annotations(
     )
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"Time taken: {elapsed_time:.2f} seconds")
+    print(f"[INFO]: Time taken: {elapsed_time:.2f} seconds")
 
     return annotations
 
@@ -144,6 +144,6 @@ def get_alignment_annotations(
         alignment_annotations[segment_id] = current_annotation
     end_time = time.time()  # End timing
     elapsed_time = end_time - start_time
-    print(f"Time taken: {elapsed_time:.2f} seconds")
+    print(f"[INFO]: Time taken: {elapsed_time:.2f} seconds")
 
     return alignment_annotations

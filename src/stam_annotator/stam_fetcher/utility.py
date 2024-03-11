@@ -21,7 +21,9 @@ def clone_repo(org, repo_name, token, destination_folder: Path):
         """make a inner folder with source org name and clone the repo in it"""
         repo_url = f"https://{token}@github.com/{org}/{repo_name}.git"
         subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
-        print(f"Repository {repo_name} cloned successfully into {destination_folder}")
+        print(
+            f"[SUCCESS]: Repository {repo_name} cloned successfully into {destination_folder}"
+        )
 
     except subprocess.CalledProcessError as e:
         raise RepoCloneError(org, repo_name, e)

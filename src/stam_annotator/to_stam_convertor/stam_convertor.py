@@ -100,7 +100,7 @@ class PechaRepo:
                 new_parent_dir / f"{parent_dir.name}.opf.json",
                 self.base_path / self.destination_org / self.pecha_id,
             )
-        print(f"Pecha repo {self.pecha_id} converted to stam successfully")
+        print(f"[SUCCESS]: Pecha repo {self.pecha_id} converted to stam successfully")
 
     def upload_pecha_repo(self):
         org_name, repo_name = DESTINATION_ORG, self.pecha_id
@@ -109,7 +109,7 @@ class PechaRepo:
             project_path = self.base_path / self.destination_org / self.pecha_id
             repo_name = self.pecha_id
             upload_files_to_github_repo(org_name, repo_name, project_path, GITHUB_TOKEN)
-            print(f"Pecha repo {repo_name} uploaded successfully")
+            print(f"[SUCCESS]: Pecha repo {repo_name} uploaded successfully")
 
 
 class AlignmentRepo:
@@ -184,7 +184,7 @@ class AlignmentRepo:
             project_path = self.base_path / self.destination_org
             repo_name = self.alignment_id
             upload_files_to_github_repo(org_name, repo_name, project_path, GITHUB_TOKEN)
-            print(f"Alignment repo {repo_name} uploaded successfully")
+            print(f"[SUCCESS]: Alignment repo {repo_name} uploaded successfully")
 
     def get_aligned_pechas(self):
         self.load_pecha_repos()

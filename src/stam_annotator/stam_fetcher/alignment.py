@@ -69,10 +69,10 @@ class Alignment:
                     destination_folder=out_path / f"{id_}",
                 )
             except RepoDoesNotExist as error:
-                print(f"Alignment {error.message}")
+                print(f"[ERROR]: Alignment {error.message}")
                 return None
             except RepoCloneError as error:
-                print(f"Alignment {error.message}")
+                print(f"[ERROR]: Alignment {error.message}")
                 return None
 
         cls.base_path = out_path / f"{id_}"

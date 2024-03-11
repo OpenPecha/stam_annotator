@@ -48,10 +48,10 @@ class Pecha:
                     destination_folder=out_path / f"{id_}",
                 )
             except RepoDoesNotExist as error:
-                print(f"Pecha {error.message}")
+                print(f"[ERROR]: Pecha {error.message}")
                 return None
             except RepoCloneError as error:
-                print(f"Pecha {error.message}")
+                print(f"[ERROR]: Pecha {error.message}")
                 return None
 
         cls.base_path = out_path / f"{id_}"
@@ -131,7 +131,7 @@ class Pecha:
         annotation_type: Optional[AnnotationEnum] = None,
     ) -> Optional[Dict]:
         if annotation_group is None or annotation_type is None:
-            print("Please provide annotation_group and annotation_type")
+            print("[INFO]: Please provide annotation_group and annotation_type")
             return None
 
         annotations = {}

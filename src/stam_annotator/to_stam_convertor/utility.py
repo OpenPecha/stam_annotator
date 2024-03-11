@@ -49,10 +49,10 @@ def create_github_repo(org_name: str, repo_name: str, token: str) -> bool:
         g = Github(token)
         org = g.get_organization(org_name)
         org.create_repo(repo_name)
-        print(f"Repository {repo_name} created successfully")
+        print(f"[SUCCESS]: Repository {repo_name} created successfully")
         return True
     except:  # noqa
-        print(f"Repo {repo_name} already exists")
+        print(f"[INFO]: Repo {repo_name} already exists")
         return False
 
 
