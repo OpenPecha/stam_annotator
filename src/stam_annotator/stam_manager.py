@@ -6,7 +6,7 @@ import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
 from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
-from stam_annotator.opa_loader import OpaAnnotation
+from stam_annotator.loaders.opa_loader import OpaAnnotation
 from stam_annotator.utility import convert_opf_stam_annotation_to_dictionary
 
 

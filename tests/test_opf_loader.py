@@ -2,7 +2,7 @@ from pathlib import Path
 
 from config import data_folder
 
-from stam_annotator.opf_loader import create_opf_annotation_instance
+from stam_annotator.loaders.opf_loader import create_opf_annotation_instance
 from stam_annotator.utility import load_opf_annotations_from_yaml
 
 

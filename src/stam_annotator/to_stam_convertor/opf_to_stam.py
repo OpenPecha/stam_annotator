@@ -5,13 +5,13 @@ from uuid import uuid4
 
 from stam import AnnotationStore, Offset, Selector
 
-from stam_annotator.annotation_store import (
+from stam_annotator.config import AnnotationGroupEnum
+from stam_annotator.exceptions import CustomDataValidationError
+from stam_annotator.loaders.annotation_store import (
     Annotation_Store,
     convert_opf_for_pre_stam_format,
 )
-from stam_annotator.config import AnnotationGroupEnum
-from stam_annotator.exceptions import CustomDataValidationError
-from stam_annotator.opf_loader import create_opf_annotation_instance
+from stam_annotator.loaders.opf_loader import create_opf_annotation_instance
 from stam_annotator.utility import load_opf_annotations_from_yaml
 
 
