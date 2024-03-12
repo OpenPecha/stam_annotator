@@ -22,20 +22,30 @@ class Alignment_MD_formatter:
             ["Segment start", "<p>"],
             ["Segment end", "</p>"],
         ]
+        pechas = list(self.alignment.segment_source.keys())
 
-        pechas_md_content: Dict[str, str] = {}
+        pechas_md_content: Dict[str, str] = {pecha_id: "" for pecha_id in pechas}
+
         for segment_pair in self.alignment.get_segment_pairs():
             for segment in segment_pair:
                 pecha_id, text = segment[1], segment[0]
                 if pecha_id not in pechas_md_content:
-                    pechas_md_content[pecha_id] = ""
+                    continue
                 pechas_md_content[pecha_id] += (
                     ann_style[0][1] + text + ann_style[1][1] + "\n"
                 )
+            """Add empty segment for pechas that don't have the segment."""
+            segment_sources = [segment[1] for segment in segment_pair]
+            for pecha_id in pechas:
+                if pecha_id not in segment_sources:
+                    pechas_md_content[pecha_id] += (
+                        ann_style[0][1] + ann_style[1][1] + "\n"
+                    )
 
         for pecha_id, md_content in pechas_md_content.items():
             output_md_file = output_dir / f"{pecha_id}.md"
             output_md_file.write_text(md_content)
+        print(f"[SUCCESS]: Alignment {self.alignment.id_} serialized successfully.")
 
 
 class Pecha_MD_formatter:

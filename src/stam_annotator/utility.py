@@ -70,7 +70,7 @@ def clone_github_repo(
     org_name: str, repo_name: str, destination_folder: Path, token: str
 ):
     if destination_folder.exists() and list(destination_folder.rglob("*")):
-        print(f"[INFO]: Repo {repo_name} already exists. Skipping cloning...")
+        pass  # Do nothing
     else:
         try:
             repo_url = f"https://{token}@github.com/{org_name}/{repo_name}.git"
