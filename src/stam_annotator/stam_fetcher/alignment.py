@@ -13,7 +13,7 @@ class Alignment:
     segment_source: Dict[str, Dict[str, str]]
     segment_pairs: Dict[str, Dict[str, str]]
 
-    def __init__(self, id_: str, github_token: str, base_path: Path):
+    def __init__(self, id_: str, base_path: Path, github_token: str = ""):
         self.id_ = id_
         self.github_token = github_token
         self.base_path = base_path
@@ -32,7 +32,13 @@ class Alignment:
 
         # load pechas
         for id_ in self.segment_source.keys():
-            self.pechas[id_] = Pecha.from_id(id_, self.github_token)
+            """if pecha exists in base path, load it"""
+            parent_dir = self.base_path.parent
+            pecha_path = parent_dir / id_
+            if pecha_path.exists():
+                self.pechas[id_] = Pecha(id_, pecha_path)
+            else:
+                self.pechas[id_] = Pecha.from_id(id_, self.github_token)
 
     @property
     def meta_data(self):
@@ -62,7 +68,11 @@ class Alignment:
         clone_github_repo(ORGANIZATION, id_, out_path, github_token)
 
         cls.base_path = out_path / f"{id_}"
-        return cls(id_, github_token, cls.base_path)
+        return cls(
+            id_,
+            cls.base_path,
+            github_token,
+        )
 
 
 if __name__ == "__main__":
