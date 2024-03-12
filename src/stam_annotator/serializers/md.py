@@ -18,29 +18,20 @@ class Alignment_MD_formatter:
         return cls(alignment) if alignment else None
 
     def serialize(self, output_dir: Path):
-        ann_style = [
-            ["Segment start", "<p>"],
-            ["Segment end", "</p>"],
-        ]
         pechas = list(self.alignment.segment_source.keys())
-
         pechas_md_content: Dict[str, str] = {pecha_id: "" for pecha_id in pechas}
 
         for segment_pair in self.alignment.get_segment_pairs():
             for segment in segment_pair:
-                pecha_id, text = segment[1], segment[0]
+                pecha_id, text, lang = segment[1], segment[0], segment[2]
                 if pecha_id not in pechas_md_content:
                     continue
-                pechas_md_content[pecha_id] += (
-                    ann_style[0][1] + text + ann_style[1][1] + "\n"
-                )
+                pechas_md_content[pecha_id] += f"<p lang={lang}>" + text + "</p>\n"
             """Add empty segment for pechas that don't have the segment."""
             segment_sources = [segment[1] for segment in segment_pair]
             for pecha_id in pechas:
                 if pecha_id not in segment_sources:
-                    pechas_md_content[pecha_id] += (
-                        ann_style[0][1] + ann_style[1][1] + "\n"
-                    )
+                    pechas_md_content[pecha_id] += "<p></p>\n"
 
         for pecha_id, md_content in pechas_md_content.items():
             output_md_file = output_dir / f"{pecha_id}.md"
