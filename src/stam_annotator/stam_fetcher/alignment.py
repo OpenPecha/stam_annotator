@@ -44,7 +44,7 @@ class Alignment:
         for id_ in self.segment_pairs:
             yield self.get_segment_pair(id_)
 
-    def get_segment_pair(self, id_) -> List[Tuple[str, str, Dict]]:
+    def get_segment_pair(self, id_) -> List[Tuple[str, str, str, Dict]]:
         segment_pair = []
         for pecha_id, segment_id in self.segment_pairs[id_].items():
             segment_lang = self.segment_source[pecha_id]["lang"]
@@ -52,7 +52,7 @@ class Alignment:
             segment_text, segment_span = self.pechas[pecha_id].get_annotation(
                 segment_id, pecha_volume_name
             )
-            segment_pair.append((segment_text, segment_lang, segment_span))
+            segment_pair.append((segment_text, pecha_id, segment_lang, segment_span))
         return segment_pair
 
     @classmethod
