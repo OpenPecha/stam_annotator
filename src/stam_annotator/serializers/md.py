@@ -4,7 +4,38 @@ from typing import Dict, List
 from antx import transfer
 
 from stam_annotator.config import PECHAS_PATH, AnnotationEnum
+from stam_annotator.stam_fetcher.alignment import Alignment
 from stam_annotator.stam_fetcher.pecha import Pecha
+
+
+class Alignment_MD_formatter:
+    def __init__(self, alignment: Alignment):
+        self.alignment = alignment
+
+    @classmethod
+    def from_id(cls, id_: str, github_token: str, out_path: Path = PECHAS_PATH):
+        alignment = Alignment.from_id(id_, github_token, out_path)
+        return cls(alignment) if alignment else None
+
+    def serialize(self, output_dir: Path):
+        ann_style = [
+            ["Segment start", "<p>"],
+            ["Segment end", "</p>"],
+        ]
+
+        pechas_md_content: Dict[str, str] = {}
+        for segment_pair in self.alignment.get_segment_pairs():
+            for segment in segment_pair:
+                pecha_id, text = segment[1], segment[0]
+                if pecha_id not in pechas_md_content:
+                    pechas_md_content[pecha_id] = ""
+                pechas_md_content[pecha_id] += (
+                    ann_style[0][1] + text + ann_style[1][1] + "\n"
+                )
+
+        for pecha_id, md_content in pechas_md_content.items():
+            output_md_file = output_dir / f"{pecha_id}.md"
+            output_md_file.write_text(md_content)
 
 
 class Pecha_MD_formatter:
@@ -28,6 +59,8 @@ class Pecha_MD_formatter:
     def group_annotations_by_type(self):
         grouped_annotations: Dict[str, Dict[str, List]] = {}
         annotations = self.pecha.get_annotations()
+        if not annotations:
+            return grouped_annotations
         for volume_id, volume_annotations in annotations.items():
             grouped_annotations[volume_id] = {}
             for annotation_id, annotation_details in volume_annotations.items():
@@ -102,8 +135,6 @@ class Pecha_MD_formatter:
 if __name__ == "__main__":
     from stam_annotator.github_token import GITHUB_TOKEN
 
-    pecha_id = "P000216"
-    formatter = Pecha_MD_formatter.from_id(pecha_id, GITHUB_TOKEN)
-
+    alignment = Alignment_MD_formatter.from_id("AB3CAED2A", GITHUB_TOKEN)
     output_dir = Path(".")
-    formatter.serialize(output_dir)
+    alignment.serialize(output_dir)
