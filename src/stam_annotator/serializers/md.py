@@ -4,6 +4,7 @@ from typing import Dict, List
 from antx import transfer
 
 from stam_annotator.config import PECHAS_PATH, AnnotationEnum
+from stam_annotator.serializers.utility import add_newlines_around_hashes
 from stam_annotator.stam_fetcher.alignment import Alignment
 from stam_annotator.stam_fetcher.pecha import Pecha
 
@@ -93,6 +94,7 @@ class Pecha_MD_formatter:
             )
 
         output_md_file = output_dir / f"{self.pecha_id}_{volume_name}.md"
+        base_text_with_ann = add_newlines_around_hashes(base_text_with_ann)
         output_md_file.write_text(base_text_with_ann)
 
     @staticmethod
@@ -123,7 +125,6 @@ class Pecha_MD_formatter:
                 ["Quotation start", "(<<<)"],
                 ["Quotation end", "(>>>)"],
             ]
-
         for annotation in annotations:
             start, end = annotation["span"]["start"], annotation["span"]["end"]
             if start >= end:
