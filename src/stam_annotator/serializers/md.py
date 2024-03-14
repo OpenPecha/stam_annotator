@@ -101,10 +101,14 @@ class Pecha_MD_formatter:
     ) -> str:
         if ann_type == AnnotationEnum.book_title.value:
             ann_style = [["BookTitle start", "(# )"]]
+        if ann_type == AnnotationEnum.sub_title.value:
+            ann_style = [["SubTitle start", "(## )"]]
         if ann_type == AnnotationEnum.chapter.value:
-            ann_style = [["Chapter start", "(## )"]]
+            ann_style = [["Chapter start", "(### )"]]
         if ann_type == AnnotationEnum.sabche.value:
-            ann_style = [["Sabche start", "(### )"]]
+            ann_style = [["Sabche start", "(#### )"]]
+        if ann_type == AnnotationEnum.pagination.value:
+            ann_style = [["Pagination start", "(##### )"]]
         if ann_type == AnnotationEnum.citation.value:
             ann_style = [["Citation start", "(> )"]]
         if ann_type == AnnotationEnum.tsawa.value:
@@ -116,8 +120,8 @@ class Pecha_MD_formatter:
             ann_style = [["Yigchung start", "(--->)"], ["Yigchung end", "(<---)"]]
         if ann_type == AnnotationEnum.quotation.value:
             ann_style = [
-                ["Quotation start", "(◊)"],
-                ["Quotation end", "(◊)"],
+                ["Quotation start", "(<<<)"],
+                ["Quotation end", "(>>>)"],
             ]
 
         for annotation in annotations:
