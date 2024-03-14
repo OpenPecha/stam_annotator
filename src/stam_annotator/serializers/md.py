@@ -100,19 +100,24 @@ class Pecha_MD_formatter:
         base_text_with_ann: str, base_text: str, ann_type: str, annotations: List[Dict]
     ) -> str:
         if ann_type == AnnotationEnum.book_title.value:
-            ann_style = [["BookTitle start", "(<h1>)"], ["BookTitle end", "(</h1>)"]]
+            ann_style = [["BookTitle start", "(# )"]]
         if ann_type == AnnotationEnum.chapter.value:
-            ann_style = [["Chapter start", "(<h2>)"], ["Chapter end", "(</h2>)"]]
+            ann_style = [["Chapter start", "(## )"]]
         if ann_type == AnnotationEnum.sabche.value:
-            ann_style = [["Sabche start", "(<h3>)"], ["Sabche end", "(</h3>)"]]
+            ann_style = [["Sabche start", "(### )"]]
+        if ann_type == AnnotationEnum.citation.value:
+            ann_style = [["Citation start", "(> )"]]
+        if ann_type == AnnotationEnum.tsawa.value:
+            ann_style = [["Tsawa start", "(>> )"]]
+
         if ann_type == AnnotationEnum.author.value:
-            ann_style = [["Author start", "(<i>—)"], ["Author end", "(—</i>)"]]
+            ann_style = [["Author start", "(===>)"], ["Author end", "(<===)"]]
         if ann_type == AnnotationEnum.yigchung.value:
-            ann_style = [["Yigchung start", "(<i>)"], ["Yigchung end", "(</i>)"]]
+            ann_style = [["Yigchung start", "(--->)"], ["Yigchung end", "(<---)"]]
         if ann_type == AnnotationEnum.quotation.value:
             ann_style = [
-                ["Quotation start", "(<blockquote>)"],
-                ["Quotation end", "(</blockquote>)"],
+                ["Quotation start", "(◊)"],
+                ["Quotation end", "(◊)"],
             ]
 
         for annotation in annotations:
@@ -123,9 +128,15 @@ class Pecha_MD_formatter:
                 base_text[:start]
                 + ann_style[0][1]
                 + base_text[start : end + 1]  # noqa
-                + ann_style[1][1]
+                + (
+                    ann_style[1][1]
+                    if len(ann_style) > 1 and len(ann_style[1]) > 1
+                    else ""
+                )
                 + base_text[end + 1 :]  # noqa
             )
+
+            print(f"Transfering  {ann_style[0][0]} annotation")
             base_text_with_ann = transfer(
                 curr_base_text_with_ann, ann_style, base_text_with_ann, output="txt"
             )
@@ -136,6 +147,9 @@ class Pecha_MD_formatter:
 if __name__ == "__main__":
     from stam_annotator.github_token import GITHUB_TOKEN
 
-    alignment = Alignment_MD_formatter.from_id("AB3CAED2A", GITHUB_TOKEN)
-    output_dir = Path(".")
-    alignment.serialize(output_dir)
+    # alignment = Alignment_MD_formatter.from_id("AB3CAED2A", GITHUB_TOKEN)
+    # output_dir = Path(".")
+    # alignment.serialize(output_dir)
+
+    pecha = Pecha_MD_formatter.from_id("P000216", GITHUB_TOKEN)
+    pecha.serialize(Path("."))
