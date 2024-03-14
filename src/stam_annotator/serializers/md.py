@@ -23,15 +23,15 @@ class Alignment_MD_formatter:
 
         for segment_pair in self.alignment.get_segment_pairs():
             for segment in segment_pair:
-                pecha_id, text, lang = segment[1], segment[0], segment[2]
+                pecha_id, text = segment[1], segment[0]
                 if pecha_id not in pechas_md_content:
                     continue
-                pechas_md_content[pecha_id] += f"<p lang={lang}>" + text + "</p>\n"
+                pechas_md_content[pecha_id] += text + "⏎\n\n"
             """Add empty segment for pechas that don't have the segment."""
             segment_sources = [segment[1] for segment in segment_pair]
             for pecha_id in pechas:
                 if pecha_id not in segment_sources:
-                    pechas_md_content[pecha_id] += "<p></p>\n"
+                    pechas_md_content[pecha_id] += "⏎\n\n"
 
         for pecha_id, md_content in pechas_md_content.items():
             output_md_file = output_dir / f"{pecha_id}.md"
