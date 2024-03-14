@@ -28,7 +28,8 @@ class Alignment_MD_formatter:
                 pecha_id, text = segment[1], segment[0]
                 if pecha_id not in pechas_md_content:
                     continue
-                pechas_md_content[pecha_id] += text + f"{NEWLINE_NORMALIZATION}\n\n"
+                text = text.replace("\n", NEWLINE_NORMALIZATION)
+                pechas_md_content[pecha_id] += text + "\n\n"
             """Add empty segment for pechas that don't have the segment."""
             segment_sources = [segment[1] for segment in segment_pair]
             for pecha_id in pechas:
@@ -157,9 +158,9 @@ class Pecha_MD_formatter:
 if __name__ == "__main__":
     from stam_annotator.github_token import GITHUB_TOKEN
 
-    # alignment = Alignment_MD_formatter.from_id("AB3CAED2A", GITHUB_TOKEN)
-    # output_dir = Path(".")
-    # alignment.serialize(output_dir)
+    alignment = Alignment_MD_formatter.from_id("AB3CAED2A", GITHUB_TOKEN)
+    output_dir = Path(".")
+    alignment.serialize(output_dir)
 
-    pecha = Pecha_MD_formatter.from_id("P000216", GITHUB_TOKEN)
-    pecha.serialize(Path("."))
+    # pecha = Pecha_MD_formatter.from_id("P000216", GITHUB_TOKEN)
+    # pecha.serialize(Path("."))
