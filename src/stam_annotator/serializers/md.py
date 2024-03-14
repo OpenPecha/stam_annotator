@@ -4,6 +4,7 @@ from typing import Dict, List
 from antx import transfer
 
 from stam_annotator.config import PECHAS_PATH, AnnotationEnum
+from stam_annotator.serializers.config import NEWLINE_NORMALIZATION
 from stam_annotator.serializers.utility import add_newlines_around_hashes
 from stam_annotator.stam_fetcher.alignment import Alignment
 from stam_annotator.stam_fetcher.pecha import Pecha
@@ -27,12 +28,12 @@ class Alignment_MD_formatter:
                 pecha_id, text = segment[1], segment[0]
                 if pecha_id not in pechas_md_content:
                     continue
-                pechas_md_content[pecha_id] += text + "⏎\n\n"
+                pechas_md_content[pecha_id] += text + f"{NEWLINE_NORMALIZATION}\n\n"
             """Add empty segment for pechas that don't have the segment."""
             segment_sources = [segment[1] for segment in segment_pair]
             for pecha_id in pechas:
                 if pecha_id not in segment_sources:
-                    pechas_md_content[pecha_id] += "⏎\n\n"
+                    pechas_md_content[pecha_id] += f"{NEWLINE_NORMALIZATION}\n\n"
 
         for pecha_id, md_content in pechas_md_content.items():
             output_md_file = output_dir / f"{pecha_id}.md"
@@ -85,6 +86,10 @@ class Pecha_MD_formatter:
 
     def serialize_volume(self, volume_name: str, output_dir: Path):
         base_text_backup = self.base_texts[volume_name]
+        base_text_backup = base_text_backup.replace(
+            "\n",
+            NEWLINE_NORMALIZATION,
+        )
         base_text_with_ann = base_text_backup
         volume_annotations = self.grouped_annotations[volume_name]
 
