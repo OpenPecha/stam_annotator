@@ -37,7 +37,8 @@ class Alignment_MD_formatter:
                     pechas_md_content[pecha_id] += f"{NEWLINE_NORMALIZATION}\n\n"
 
         for pecha_id, md_content in pechas_md_content.items():
-            output_md_file = output_dir / f"{pecha_id}.md"
+            pecha_lang = self.alignment.segment_source[pecha_id]["lang"]
+            output_md_file = output_dir / f"{pecha_id}_{pecha_lang}.md"
             output_md_file.write_text(md_content)
         print(f"[SUCCESS]: Alignment {self.alignment.id_} serialized successfully.")
 
