@@ -31,22 +31,24 @@ class Alignment_MD_formatter:
             pechas_md_content[pecha_id] = pecha_md_content
 
         segment_ann_start = "###### "
-
-        for segment_pair in self.alignment.get_segment_pairs():
+        segment_ann_end = f"{NEWLINE_NORMALIZATION}\n\n"
+        segment_pairs = list(self.alignment.get_segment_pairs())
+        for index, segment_pair in enumerate(segment_pairs):
+            if index == len(segment_pairs) - 1:
+                segment_ann_end = ""
             for segment in segment_pair:
                 pecha_id, text = segment[1], segment[0]
                 if pecha_id not in pechas_md_content:
                     continue
                 text = text.replace("\n", NEWLINE_NORMALIZATION)
-                current_segment = (
-                    segment_ann_start + text + f"{NEWLINE_NORMALIZATION}\n\n"
-                )
+                current_segment = segment_ann_start + text + segment_ann_end
+
                 pechas_md_content[pecha_id] += current_segment
             """Add empty segment for pechas that don't have the segment."""
             segment_sources = [segment[1] for segment in segment_pair]
             for pecha_id in pechas:
                 if pecha_id not in segment_sources:
-                    current_segment = segment_ann_start + f"{NEWLINE_NORMALIZATION}\n\n"
+                    current_segment = segment_ann_start + segment_ann_end
                     pechas_md_content[pecha_id] += current_segment
 
         for pecha_id, md_content in pechas_md_content.items():
