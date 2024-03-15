@@ -30,18 +30,24 @@ class Alignment_MD_formatter:
             pecha_md_content = f"source : {pecha_source}\n\n"
             pechas_md_content[pecha_id] = pecha_md_content
 
+        segment_ann_start = "###### "
+
         for segment_pair in self.alignment.get_segment_pairs():
             for segment in segment_pair:
                 pecha_id, text = segment[1], segment[0]
                 if pecha_id not in pechas_md_content:
                     continue
                 text = text.replace("\n", NEWLINE_NORMALIZATION)
-                pechas_md_content[pecha_id] += text + "\n\n"
+                current_segment = (
+                    segment_ann_start + text + f"{NEWLINE_NORMALIZATION}\n\n"
+                )
+                pechas_md_content[pecha_id] += current_segment
             """Add empty segment for pechas that don't have the segment."""
             segment_sources = [segment[1] for segment in segment_pair]
             for pecha_id in pechas:
                 if pecha_id not in segment_sources:
-                    pechas_md_content[pecha_id] += f"{NEWLINE_NORMALIZATION}\n\n"
+                    current_segment = segment_ann_start + f"{NEWLINE_NORMALIZATION}\n\n"
+                    pechas_md_content[pecha_id] += current_segment
 
         for pecha_id, md_content in pechas_md_content.items():
             pecha_lang = self.alignment.segment_source[pecha_id]["lang"]
