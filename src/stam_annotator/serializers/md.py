@@ -23,6 +23,13 @@ class Alignment_MD_formatter:
         pechas = list(self.alignment.segment_source.keys())
         pechas_md_content: Dict[str, str] = {pecha_id: "" for pecha_id in pechas}
 
+        """ Add pecha source to md content """
+        for pecha_id in pechas:
+            pecha = self.alignment.pechas[pecha_id]
+            pecha_source = pecha.meta_data["source"]
+            pecha_md_content = f"source : {pecha_source}\n\n"
+            pechas_md_content[pecha_id] = pecha_md_content
+
         for segment_pair in self.alignment.get_segment_pairs():
             for segment in segment_pair:
                 pecha_id, text = segment[1], segment[0]
