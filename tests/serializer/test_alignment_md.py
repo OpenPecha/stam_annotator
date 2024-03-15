@@ -22,6 +22,3 @@ def test_alignment_md_serializer():
 
     (data_folder / "I0604E8AE_bo.md").unlink()
     (data_folder / "I95FE2C27_en-us.md").unlink()
-
-
-test_alignment_md_serializer()
