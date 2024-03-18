@@ -5,14 +5,14 @@ from uuid import uuid4
 
 from stam import AnnotationStore, Offset, Selector
 
-from stam_annotator.annotation_store import (
+from stam_annotator.config import AnnotationGroupEnum
+from stam_annotator.exceptions import CustomDataValidationError
+from stam_annotator.loaders.annotation_store import (
     Annotation_Store,
     convert_opf_for_pre_stam_format,
 )
-from stam_annotator.config import AnnotationGroupEnum
-from stam_annotator.exceptions import CustomDataValidationError
-from stam_annotator.opf_loader import create_opf_annotation_instance
-from stam_annotator.utility import load_opf_annotations_from_yaml
+from stam_annotator.loaders.opf_loader import create_opf_annotation_instance
+from stam_annotator.loaders.utility import load_opf_annotations_from_yaml
 
 
 def get_uuid():
@@ -23,8 +23,8 @@ def create_annotationstore(id: str):
     return AnnotationStore(id=id)
 
 
-def create_resource(store: AnnotationStore, resource_id: str, text: str):
-    return store.add_resource(id=resource_id, text=text)
+def create_resource(store: AnnotationStore, resource_id: str, resource_file_path: Path):
+    return store.add_resource(id=resource_id, filename=str(resource_file_path))
 
 
 def create_dataset(store: AnnotationStore, id: str, key: AnnotationGroupEnum):
@@ -46,7 +46,7 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
 
     for resource in annotation_store.resources:
         create_resource(
-            store=store, resource_id=resource.resource_id, text=resource.text
+            store=store, resource_id=resource.id_, resource_file_path=resource.file_path
         )
     # Create dataset
     data_set = annotation_store.datasets[0]
@@ -58,7 +58,7 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
         annotation_data = annotation.annotation_data
         data = [
             {
-                "id": get_uuid(),
+                "id": annotation_data.annotation_data_id,
                 "key": annotation_data.annotation_data_key.value,
                 "value": annotation_data.annotation_data_value.value,
                 "set": dataset.id(),
@@ -66,7 +66,9 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
         ]
         if annotation.payloads:
             for key, value in annotation.payloads.items():
-                data.append({"key": key, "value": value, "set": dataset.id()})
+                data.append(
+                    {"id": get_uuid(), "key": key, "value": value, "set": dataset.id()}
+                )
 
         create_annotation(
             store=store,
