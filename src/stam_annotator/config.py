@@ -10,7 +10,7 @@ def _mkdir(path):
 
 
 # Path
-BASE_PATH = _mkdir(Path.home() / ".openpecha")
+BASE_PATH = _mkdir(Path.home() / ".pecha_data")
 PECHAS_PATH = _mkdir(BASE_PATH / "pechas")
 ROOT_DIR = Path(__file__).parent.parent.parent
 

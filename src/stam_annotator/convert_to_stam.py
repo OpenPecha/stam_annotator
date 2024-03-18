@@ -97,6 +97,7 @@ class PechaRepo:
             combined_stam = (
                 stams_in_dir[0] if stams_count == 1 else combine_stams(stams_in_dir)
             )
+
             save_annotation_store(
                 combined_stam, new_parent_dir / f"{parent_dir.name}.opf.json"
             )
@@ -305,4 +306,3 @@ if __name__ == "__main__":
     pecha_repo = PechaRepo.from_id("P000216")
     pecha_repo.get_pecha_repo()
     pecha_repo.convert_pecha_repo_to_stam()
-    pecha_repo.upload_pecha_repo()

@@ -68,7 +68,7 @@ def opf_annotation_store_to_stam(annotation_store: Annotation_Store):
             for key, value in annotation.payloads.items():
                 data.append({"key": key, "value": value, "set": dataset.id()})
 
-        _ = create_annotation(
+        create_annotation(
             store=store,
             id=annotation.annotation_id,
             target=Selector.textselector(
