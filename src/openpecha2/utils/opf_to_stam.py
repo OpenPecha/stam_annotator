@@ -11,7 +11,7 @@ from openpecha2.utils.annotation_store import (
     Annotation_Store,
     convert_opf_for_pre_stam_format,
 )
-from openpecha2.utils.opf_loader import create_opf_annotation_instance
+from openpecha2.utils.opf import create_opf_annotation_instance
 from openpecha2.utils.utility import load_opf_annotations_from_yaml
 
 

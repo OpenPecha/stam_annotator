@@ -6,7 +6,7 @@ import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
 from openpecha2.config import AnnotationEnum, AnnotationGroupEnum
-from openpecha2.utils.opa_loader import OpaAnnotation
+from openpecha2.utils.opa import OpaAnnotation
 from openpecha2.utils.utils import convert_opf_stam_annotation_to_dictionary
 
 
