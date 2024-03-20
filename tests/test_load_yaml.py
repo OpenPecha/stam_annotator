@@ -2,7 +2,7 @@ from pathlib import Path
 
 from config import data_folder
 
-from openpecha2.loaders.utility import load_opf_annotations_from_yaml
+from openpecha2.utils.utility import load_opf_annotations_from_yaml
 
 
 def test_load_opf_annotations_from_yaml():

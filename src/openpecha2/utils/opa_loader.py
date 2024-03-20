@@ -3,8 +3,8 @@ from typing import Dict
 
 from pydantic import BaseModel, field_validator
 
-from openpecha2.loaders.utility import load_opa_annotations_from_yaml
 from openpecha2.utility import read_json_to_dict
+from openpecha2.utils.utility import load_opa_annotations_from_yaml
 
 
 class SegmentSource(BaseModel):

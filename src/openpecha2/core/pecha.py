@@ -5,9 +5,9 @@ from typing import Dict, List, Optional, Tuple
 from stam import Annotation, AnnotationStore
 
 from openpecha2.config import PECHAS_PATH, AnnotationEnum, AnnotationGroupEnum
-from openpecha2.loaders.utility import get_enum_value_if_match_ignore_case
-from openpecha2.stam_fetcher.utility import add_base_path_to_stam_annotation_files
 from openpecha2.utility import clone_github_repo
+from openpecha2.utils import add_base_path_to_stam_annotation_files
+from openpecha2.utils.utility import get_enum_value_if_match_ignore_case
 
 ORGANIZATION = "PechaData"
 

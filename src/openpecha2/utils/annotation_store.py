@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
 
 from openpecha2.config import AnnotationEnum, AnnotationGroupEnum
-from openpecha2.loaders.opf_loader import OpfAnnotation, Span
 from openpecha2.utility import get_uuid
+from openpecha2.utils.opf_loader import OpfAnnotation, Span
 
 
 class Annotation_Data(BaseModel):
