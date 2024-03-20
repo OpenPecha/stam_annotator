@@ -4,7 +4,7 @@ from typing import Dict
 
 from pydantic import BaseModel, field_validator
 
-from openpecha2.utils.utility import load_opa_annotations_from_yaml
+from openpecha2.utils.opa_opf_loader import load_opa_annotations_from_yaml
 
 
 class SegmentSource(BaseModel):

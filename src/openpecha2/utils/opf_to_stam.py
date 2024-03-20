@@ -7,12 +7,12 @@ from stam import AnnotationStore, Offset, Selector
 
 from openpecha2.config import AnnotationGroupEnum
 from openpecha2.exceptions import CustomDataValidationError
+from openpecha2.utils.opa_opf_loader import load_opf_annotations_from_yaml
 from openpecha2.utils.opf import create_opf_annotation_instance
 from openpecha2.utils.stam_formatter import (
     Annotation_Store,
     convert_opf_for_pre_stam_format,
 )
-from openpecha2.utils.utility import load_opf_annotations_from_yaml
 
 
 def get_uuid():
