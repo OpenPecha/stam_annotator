@@ -1,5 +1,4 @@
 import json
-import subprocess
 from collections import OrderedDict
 from pathlib import Path
 from typing import Dict, Union
@@ -66,23 +65,13 @@ def save_json_file(data: Dict, output_file_path: Union[str, Path]):
         json.dump(data, f, indent=4)
 
 
-def clone_github_repo(
-    org_name: str, repo_name: str, destination_folder: Path, token: str
-):
-    repo_path = destination_folder / repo_name
-    if repo_path.exists() and list(repo_path.rglob("*")):
-        pass  # Do nothing
-    else:
-        try:
-            repo_url = f"https://github.com/{org_name}/{repo_name}.git"
-            env = {"GIT_ASKPASS": "echo", "GIT_PASSWORD": token}
-            subprocess.run(
-                ["git", "clone", repo_url, str(repo_path)],
-                check=True,
-                capture_output=True,
-                env=env,
-            )
-            print(f"[SUCCESS]: Repository {repo_name} cloned successfully.")
+def add_base_path_to_stam_annotation_files(base_path: Path):
+    for file in base_path.rglob("*.opf.json"):
+        with file.open() as f:
+            json_data = json.load(f)
 
-        except subprocess.CalledProcessError as e:
-            print(f"[ERROR]: Error cloning {repo_name} repository: {e}")
+        include_path = json_data["resources"][0]["@include"]
+        json_data["resources"][0]["@include"] = str(base_path / include_path)
+
+        with file.open("w") as f:
+            json.dump(json_data, f, indent=2)

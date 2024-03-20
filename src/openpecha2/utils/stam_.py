@@ -5,20 +5,19 @@ from typing import Dict
 
 from openpecha2.config import ROOT_DIR, AnnotationGroupEnum
 from openpecha2.github_token import GITHUB_TOKEN
-from openpecha2.utility import (
+from openpecha2.github_utils import (
     clone_github_repo,
-    save_annotation_store,
-    sort_dict_by_path_strings,
+    create_github_repo,
+    upload_files_to_github_repo,
 )
+from openpecha2.utility import save_annotation_store, sort_dict_by_path_strings
 from openpecha2.utils.opf_to_stam import opf_to_stam_pipeline
 from openpecha2.utils.stam_manager import combine_stams
 from openpecha2.utils.utils import (
     convert_yml_file_to_json,
-    create_github_repo,
     get_folder_structure,
     make_local_folder,
     replace_parent_folder_name,
-    upload_files_to_github_repo,
 )
 
 SOURCE_ORG = "OpenPecha-Data"

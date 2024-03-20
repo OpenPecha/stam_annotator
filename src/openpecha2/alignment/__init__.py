@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 
 from openpecha2.config import PECHAS_PATH
 from openpecha2.core.pecha import Pecha
-from openpecha2.utility import clone_github_repo
+from openpecha2.github_utils import clone_github_repo
 
 ORGANIZATION = "PechaData"
 
