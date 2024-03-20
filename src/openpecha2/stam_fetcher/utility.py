@@ -3,7 +3,7 @@ from pathlib import Path
 
 from github import Github, GithubException
 
-from stam_annotator.exceptions import RepoDoesNotExist
+from openpecha2.exceptions import RepoDoesNotExist
 
 
 def check_repo_exists(token, org_name, repo_name):

@@ -3,11 +3,11 @@ import shutil
 from pathlib import Path
 from typing import Dict
 
-from stam_annotator.config import ROOT_DIR, AnnotationGroupEnum
-from stam_annotator.github_token import GITHUB_TOKEN
-from stam_annotator.stam_manager import combine_stams
-from stam_annotator.to_stam_convertor.opf_to_stam import opf_to_stam_pipeline
-from stam_annotator.to_stam_convertor.utility import (
+from openpecha2.config import ROOT_DIR, AnnotationGroupEnum
+from openpecha2.github_token import GITHUB_TOKEN
+from openpecha2.stam_manager import combine_stams
+from openpecha2.to_stam_convertor.opf_to_stam import opf_to_stam_pipeline
+from openpecha2.to_stam_convertor.utility import (
     convert_yml_file_to_json,
     create_github_repo,
     get_folder_structure,
@@ -15,7 +15,7 @@ from stam_annotator.to_stam_convertor.utility import (
     replace_parent_folder_name,
     upload_files_to_github_repo,
 )
-from stam_annotator.utility import (
+from openpecha2.utility import (
     clone_github_repo,
     save_annotation_store,
     sort_dict_by_path_strings,
