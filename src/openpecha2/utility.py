@@ -7,14 +7,6 @@ from uuid import uuid4
 from stam import AnnotationStore
 
 
-def get_filename_without_extension(file_path: Union[str, Path]):
-    return Path(str(file_path)).stem
-
-
-def is_json_file_path(file_path: Path) -> bool:
-    return file_path.suffix == ".json"
-
-
 def get_uuid():
     return uuid4().hex
 
@@ -23,13 +15,6 @@ def sort_dict_by_path_strings(input_dict):
     sorted_keys = sorted(input_dict.keys(), key=lambda x: str(x))
     sorted_dict = OrderedDict((key, input_dict[key]) for key in sorted_keys)
     return sorted_dict
-
-
-def read_json_to_dict(file_path: Path) -> Dict:
-    if not is_json_file_path(file_path):
-        raise ValueError(f"The file path must lead to a JSON file. Given: {file_path}")
-    with open(file_path, encoding="utf-8") as file:
-        return json.load(file)
 
 
 def replace_key(dictionary, old_key, new_key):
@@ -57,12 +42,6 @@ def modify_file_path_in_json(json_data: Dict, base_directory) -> Dict:
         modified_path = include_path
     json_data["resources"][0]["@include"] = modified_path
     return json_data
-
-
-def save_json_file(data: Dict, output_file_path: Union[str, Path]):
-    output_file_path = Path(output_file_path)
-    with open(output_file_path, "w") as f:
-        json.dump(data, f, indent=4)
 
 
 def add_base_path_to_stam_annotation_files(base_path: Path):

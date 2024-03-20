@@ -9,11 +9,6 @@ import yaml
 from stam import Annotations
 
 
-def make_local_folder(destination_folder: Path) -> Path:
-    destination_folder.mkdir(parents=True, exist_ok=True)
-    return destination_folder
-
-
 def get_folder_structure(path: Path):
     base_path = Path(path)
     grouped_files: Dict[Path, List] = {}
