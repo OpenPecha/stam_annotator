@@ -3,11 +3,12 @@ from unittest import mock
 
 from openpecha2.utils.opa_opf_loader import load_opf_annotations_from_yaml
 
+data_folder = Path(__file__).parent.absolute() / "data"
+
 
 def test_load_opf_with_one_annotation():
     with mock.patch("openpecha2.utils.opa_opf_loader.get_uuid") as mock_get_uuid:
         mock_get_uuid.return_value = "a1f3e26bdb08449aaece0bba4ac4f5cc"
-        data_folder = Path(__file__).parent.absolute() / "data"
         yaml_file_path = data_folder / "opf_author.yml"
 
         mock_get_uuid.return_value = "a1f3e26bdb08449aaece0bba4ac4f5cc"
@@ -35,7 +36,6 @@ def test_load_opf_with_one_annotation():
 
 
 def test_load_opf_with_multiple_annotations():
-    data_folder = Path(__file__).parent.absolute() / "data"
     yaml_file_path = data_folder / "opf_quotations.yml"
     opf_annot = load_opf_annotations_from_yaml(yaml_file_path)
 

@@ -3,10 +3,10 @@ from pathlib import Path
 from openpecha2.utils.opa_opf_loader import load_opf_annotations_from_yaml
 from openpecha2.utils.opf import create_opf_annotation_instance
 
+data_folder = Path(__file__).parent.absolute() / "data"
 
-def test_create_annotation_loader():
-    # opf_author.yml has only one annotation
-    data_folder = Path(__file__).parent.absolute() / "data"
+
+def test_create_opf_instance_with_single_annotation():
     yaml_file_path = data_folder / "opf_author.yml"
     yaml_content = load_opf_annotations_from_yaml(yaml_file_path)
 
@@ -20,8 +20,9 @@ def test_create_annotation_loader():
             assert start == 19
             assert end == 83
 
-    # opf_quotations.yml has more than one annotation
-    yaml_file_path = Path(__file__).parent.absolute() / "data" / "opf_quotations.yml"
+
+def test_create_opf_instance_with_annotations():
+    yaml_file_path = data_folder / "opf_quotations.yml"
     yaml_content = load_opf_annotations_from_yaml(yaml_file_path)
 
     annotation_doc = create_opf_annotation_instance(yaml_content)
@@ -37,7 +38,3 @@ def test_create_annotation_loader():
             start, end = annotation.span.start, annotation.span.end
             assert start == 16444
             assert end == 16450
-
-
-if __name__ == "__main__":
-    test_create_annotation_loader()
