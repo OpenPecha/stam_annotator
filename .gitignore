@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 github_token.py
 tests/serializer/pecha_data/P000216/P000216.opf/layers/v001.opf.json
+tests/serializer/alignment_data/I95FE2C27/I95FE2C27.opf/layers/8F35.opf.json
+tests/serializer/alignment_data/I0604E8AE/I0604E8AE.opf/layers/884E.opf.json
+
 
 # C extensions
 *.so

@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from antx import transfer
 
-from openpecha2.alignment.alignment import Alignment
+from openpecha2.alignment import Alignment
 from openpecha2.config import PECHAS_PATH, AnnotationEnum
 from openpecha2.core.pecha import Pecha
 from openpecha2.serializers.config import NEWLINE_NORMALIZATION
