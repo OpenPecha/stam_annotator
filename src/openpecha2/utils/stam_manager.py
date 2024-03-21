@@ -5,9 +5,9 @@ from typing import List, Sequence, Union
 import stam
 from stam import AnnotationDataSet, Annotations, AnnotationStore
 
-from stam_annotator.config import AnnotationEnum, AnnotationGroupEnum
-from stam_annotator.opa_loader import OpaAnnotation
-from stam_annotator.utility import convert_opf_stam_annotation_to_dictionary
+from openpecha2.config import AnnotationEnum, AnnotationGroupEnum
+from openpecha2.utils.opa import OpaAnnotation
+from openpecha2.utils.utils import convert_opf_stam_annotation_to_dictionary
 
 
 def load_stam_from_json(file_path: Union[str, Path]) -> AnnotationStore:
@@ -50,7 +50,7 @@ def get_annotations(
     )
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"Time taken: {elapsed_time:.2f} seconds")
+    print(f"[INFO]: Time taken: {elapsed_time:.2f} seconds")
 
     return annotations
 
@@ -144,6 +144,6 @@ def get_alignment_annotations(
         alignment_annotations[segment_id] = current_annotation
     end_time = time.time()  # End timing
     elapsed_time = end_time - start_time
-    print(f"Time taken: {elapsed_time:.2f} seconds")
+    print(f"[INFO]: Time taken: {elapsed_time:.2f} seconds")
 
     return alignment_annotations
