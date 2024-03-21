@@ -1,13 +1,12 @@
 from pathlib import Path
 
-from config import data_folder
-
 from openpecha2.utils.opa_opf_loader import load_opf_annotations_from_yaml
 from openpecha2.utils.opf import create_opf_annotation_instance
 
 
 def test_create_annotation_loader():
     # opf_author.yml has only one annotation
+    data_folder = Path(__file__).parent.absolute() / "data"
     yaml_file_path = data_folder / "opf_author.yml"
     yaml_content = load_opf_annotations_from_yaml(yaml_file_path)
 
