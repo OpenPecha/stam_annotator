@@ -3,7 +3,7 @@ from unittest import mock
 
 from openpecha2.utils.opa_opf_loader import load_opf_annotations_from_yaml
 
-data_folder = Path(__file__).parent.absolute() / "data"
+data_folder = Path(__file__).parent.absolute() / "opf_data"
 
 
 def test_load_opf_with_one_annotation():
