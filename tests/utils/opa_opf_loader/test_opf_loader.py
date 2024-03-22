@@ -65,6 +65,3 @@ def test_load_opf_with_multiple_annotations():
     ), "Annotations must be a dictionary"
 
     assert opf_annot["annotations"] == expected_opf_annot["annotations"]
-
-
-test_load_opf_with_one_annotation()
